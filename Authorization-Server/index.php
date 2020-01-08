@@ -102,6 +102,21 @@ require_once ('keccak.php');
         $response->send();
         agentCreateHashLock($keypair[2],"{\"nonce\":\"".base64_encode($keypair[0])."\"}");
     }
+
+    /*
+     * The client interacts directly with the OAuth Server
+     */ 
+    if(isset($_POST['grant_type']) && $_POST['grant_type'] == 'verifiable_credentials')
+    { 
+        ini_set('display_errors',1);error_reporting(E_ALL);
+        require_once('oauth2-server-php/src/OAuth2/Autoloader.php');
+        OAuth2\Autoloader::register();
+        $dsn     = 'sqlite:'.__DIR__."/db/oauth2.db";
+        $storage = new OAuth2\Storage\Pdo(array('dsn' => $dsn));
+        $server  = new OAuth2\Server($storage);
+        $server->addGrantType(new OAuth2\GrantType\VerifiableCredentials($storage));
+        $server->handleTokenRequest(OAuth2\Request::createFromGlobals())->send();
+    }
     
     /*
     *  In the first scenario, we insert a key (AS1ThingKey) for symmetric encryption, 
