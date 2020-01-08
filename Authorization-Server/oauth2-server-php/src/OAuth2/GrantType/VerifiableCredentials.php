@@ -60,7 +60,9 @@ class VerifiableCredentials implements GrantTypeInterface, ClientAssertionTypeIn
      */
     public function validateRequest(RequestInterface $request, ResponseInterface $response)
     {
-        return true;
+        $did = $request->request('did');
+        echo "DID: $did";
+        return false;
     }
 
     /**
