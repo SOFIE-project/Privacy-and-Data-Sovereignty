@@ -60,9 +60,18 @@ class VerifiableCredentials implements GrantTypeInterface, ClientAssertionTypeIn
      */
     public function validateRequest(RequestInterface $request, ResponseInterface $response)
     {
-        $did = $request->request('did');
-        echo "DID: $did";
-        return false;
+        $cred_def_id = $request->request('cred_def_id');
+        $proof       = $request->request('proof');
+        if($proof)
+        {
+            return true;
+        }else
+        {
+            exec("python3 ../Agent/PDS-agent.py -o $cred_def_id",$output, $return_var);
+            //$response->setParameter("cred_offer", $output[0]);
+            echo $output[0];
+            return false;
+        }
     }
 
     /**

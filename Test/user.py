@@ -24,6 +24,7 @@ endorser = {
 user_wallet = {
     'wallet_config': json.dumps({'id': 'client_wallet'}),
     'wallet_credentials': json.dumps({'key': 'client_wallet_key'}),
+    'seed': '000000000000000000000000000user1' #used only for CI/CD pursposed
 }
 
 #End configuration
@@ -69,7 +70,7 @@ async def():
 
 async def generate(wallet_config, wallet_credentials):
     wallet_handle = await wallet.open_wallet(wallet_config, wallet_credentials)
-    id, verkey    = await did.create_and_store_my_did(wallet_handle, "{}")
+    id, verkey    = await did.create_and_store_my_did(wallet_handle, json.dumps({'seed': user_wallet['seed']}))
     nym_request   = await ledger.build_nym_request(endorser['did'], id, verkey, None, None)
     print(nym_request)
     await wallet.close_wallet(wallet_handle)
@@ -81,6 +82,17 @@ async def create_credential_request(wallet_config, wallet_credentials,cred_def, 
     cred_request, cred_request_metadata =  await anoncreds.prover_create_credential_req(wallet_handle, user_did, offer, cred_def, "msk_key")
     print("Credential request : ", cred_request)
     print("Credential request metadata: ", cred_request_metadata)
+    await wallet.close_wallet(wallet_handle)
+
+async def get_credential_definition(wallet_config, wallet_credentials,cred_def_id):
+    pool_handle   = await open_pool()
+    wallet_handle = await wallet.open_wallet(wallet_config, wallet_credentials)
+    dids          = json.loads( await did.list_my_dids_with_meta(wallet_handle) )
+    user_did      = dids[0]['did']
+    get_cred_def_request = await ledger.build_get_cred_def_request(user_did,cred_def_id)
+    get_cred_def_response = await ledger.submit_request(pool_handle, get_cred_def_request)
+    transcript_cred_def   = await ledger.parse_get_cred_def_response(get_cred_def_response)
+    print(transcript_cred_def)
     await wallet.close_wallet(wallet_handle)
 
 def main():
@@ -100,7 +112,7 @@ def main():
         loop.close()
     if(args.credef):
         loop = asyncio.get_event_loop()
-        loop.run_until_complete(create_credential_request(user_wallet['wallet_config'], user_wallet['wallet_credentials'], args.credef, args.offer))
+        loop.run_until_complete(get_credential_definition(user_wallet['wallet_config'], user_wallet['wallet_credentials'], args.credef)) #, args.offer))
         loop.close()
 
 
