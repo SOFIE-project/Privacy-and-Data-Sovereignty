@@ -78,11 +78,17 @@ async def generate(wallet_config, wallet_credentials):
 async def create_credential_request(wallet_config, wallet_credentials,cred_def, offer):
     wallet_handle = await wallet.open_wallet(wallet_config, wallet_credentials)
     dids          = json.loads( await did.list_my_dids_with_meta(wallet_handle) )
-    user_did      = dids[1]['did']
+    user_did      = dids[0]['did']
     cred_request, cred_request_metadata =  await anoncreds.prover_create_credential_req(wallet_handle, user_did, offer, cred_def, "msk_key")
     print("Credential request : ", cred_request)
     print("Credential request metadata: ", cred_request_metadata)
     await wallet.close_wallet(wallet_handle)
+
+async def store_credential(wallet_config, wallet_credentials,credentials):
+    wallet_handle = await wallet.open_wallet(wallet_config, wallet_credentials)
+    dids          = json.loads( await did.list_my_dids_with_meta(wallet_handle) )
+    user_did      = dids[0]['did']
+    await anoncreds.prover_store_credential(wallet_handle, None, cred_request, cred_request_metadata, credentials, cred_def, None)0000
 
 async def get_credential_definition(wallet_config, wallet_credentials,cred_def_id):
     pool_handle   = await open_pool()
@@ -97,12 +103,13 @@ async def get_credential_definition(wallet_config, wallet_credentials,cred_def_i
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-s', '--setup', help="Creates wallet", action='store_true')
+    parser.add_argument('-w', '--wallet', help="Creates wallet", action='store_true')
     parser.add_argument('-g', '--generate', help="Generate a DID, stores it in the wallet, and outputs the nym request", action='store_true')
     parser.add_argument('-c', '--credential', dest='credef', type=str, help="Creates and outputs a credential request for the provided credef. Use with -o")
     parser.add_argument('-o', '--offer', dest='offer', type=str, help="The crendetial offer. Use with -c")
+    parser.add_argument('-s', '--store', dest='credoff', type=str, help="Stores the credential offer credoff in the wallet")
     args = parser.parse_args()
-    if(args.setup == True):
+    if(args.wallet == True):
         loop = asyncio.get_event_loop()
         loop.run_until_complete(create_wallet(user_wallet['wallet_config'], user_wallet['wallet_credentials']))
         loop.close()
@@ -112,7 +119,7 @@ def main():
         loop.close()
     if(args.credef):
         loop = asyncio.get_event_loop()
-        loop.run_until_complete(get_credential_definition(user_wallet['wallet_config'], user_wallet['wallet_credentials'], args.credef)) #, args.offer))
+        loop.run_until_complete(create_credential_request(user_wallet['wallet_config'], user_wallet['wallet_credentials'], args.credef, args.offer))
         loop.close()
 
 

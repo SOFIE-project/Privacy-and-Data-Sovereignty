@@ -122,6 +122,12 @@ async def create_credential_offer(cred_id):
     print(cred_offer)
     await wallet.close_wallet(wallet_handle)
 
+async def create_credential(cred_values, cred_offer, cred_request):
+    wallet_handle = await wallet.open_wallet(endorser['wallet_config'], endorser['wallet_credentials'])
+    cred_def, _, _ = await anoncreds.issuer_create_credential(wallet_handle, cred_offer, cred_request, cred_values, None, None)
+    print (cred_def)
+    await wallet.close_wallet(wallet_handle)                                          
+
 async def sign_and_submit_nym(nym_request):
     pool_handle   = await open_pool()
     wallet_handle = await wallet.open_wallet(endorser['wallet_config'], endorser['wallet_credentials'])
@@ -135,6 +141,9 @@ def main():
     parser.add_argument('-d', '--definition', dest='schema', type=str, help="Creates credentials definition based on the provided SCHEMA and outputs the definition did")
     parser.add_argument('-o', '--offer', dest='credid', type=str, help="Creates and outputs a credential offer for the provided credid")
     parser.add_argument('-s', '--setup', help="Setups steward and endorser wallets, endorser DID, and stores endorses DID in the ledger", action='store_true')
+    parser.add_argument('-c', '--create', dest="credrequest", help="Creates credentials for the provided credrequest. User with -v and -f")
+    parser.add_argument('-f', '--reqoff', dest="reqoff", help="The credential request offer generated using the -o option")
+    parser.add_argument('-v', '--values', dest="values", help="The credential request values")
     args = parser.parse_args()
     if(args.setup == True):
         loop = asyncio.get_event_loop()
@@ -152,7 +161,10 @@ def main():
         loop = asyncio.get_event_loop()
         loop.run_until_complete(create_credential_offer(args.credid))
         loop.close()
-
+    if(args.credrequest):
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(create_credential(args.values, args.reqoff, args.credrequest))
+        loop.close()
     
 
 

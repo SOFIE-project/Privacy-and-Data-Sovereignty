@@ -18,7 +18,10 @@ class VerifiableCredentials implements GrantTypeInterface, ClientAssertionTypeIn
     /**
      * @var array
      */
-    private $clientData;
+    private $clientId;
+    private $scope;
+    private $userId;
+    private $issuer_did;
 
     /**
      * @param ClientCredentialsInterface $storage
@@ -35,6 +38,7 @@ class VerifiableCredentials implements GrantTypeInterface, ClientAssertionTypeIn
 
         $this->storage = $storage;
         $this->config = $config;
+        $this->issuer_did = $config['issuer_did'];
         /*
         array_merge(array(
             'allow_credentials_in_request_body' => true,
@@ -62,14 +66,20 @@ class VerifiableCredentials implements GrantTypeInterface, ClientAssertionTypeIn
     {
         $cred_def_id = $request->request('cred_def_id');
         $proof       = $request->request('proof');
+        $scope       = $request->request('scope');
+        $clientId    = $request->request('aud');
+        $userId      = $request->request('sub');
         if($proof)
         {
-            return true;
+            $proof_request = $this->generate_proof_request();
+            exec("python3 ../Agent/PDS-agent.py -v -r '$proof_request' -p '$proof'",$output,$return_var);
+            if($output[0] == 200)
+                return true;
+            else
+                return false;
         }else
         {
-            exec("python3 ../Agent/PDS-agent.py -o $cred_def_id",$output, $return_var);
-            //$response->setParameter("cred_offer", $output[0]);
-            echo $output[0];
+            echo $this->generate_proof_request();
             return false;
         }
     }
@@ -81,7 +91,7 @@ class VerifiableCredentials implements GrantTypeInterface, ClientAssertionTypeIn
      */
     public function getScope()
     {
-        return null;
+        return $this->scope;
     }
 
     /**
@@ -91,7 +101,7 @@ class VerifiableCredentials implements GrantTypeInterface, ClientAssertionTypeIn
      */
     public function getClientId()
     {
-        return "clientId";
+        return $this->clientId;
     }
 
     /**
@@ -101,7 +111,7 @@ class VerifiableCredentials implements GrantTypeInterface, ClientAssertionTypeIn
      */
     public function getUserId()
     {
-        return "userId";
+        return $this->userId;
     }
 
     /**
@@ -123,6 +133,28 @@ class VerifiableCredentials implements GrantTypeInterface, ClientAssertionTypeIn
         $includeRefreshToken = false;
 
         return $accessToken->createAccessToken($client_id, $user_id, $scope, $includeRefreshToken);
+    }
+
+    private function generate_proof_request()
+    {
+        $issuer = $this->issuer_did;
+        $nonce =  $this->get_nonce();
+        $proof =  '{"nonce": "'.$nonce.'","name": "proof_req_1", "version": "0.1", "requested_attributes":';
+        $proof .= '{"attr1_referent": {"name": "resources", "restrictions": [{"issuer_did": "'.$issuer.'"}]}}';
+        $proof .= ',"requested_predicates": {}';
+        $proof .= '}';
+        return $proof;
+    }
+
+    private function get_nonce()
+    {
+        $nonce = rand(1,9);
+        for($i=0; $i<30; $i++) {
+            $nonce .= rand(0,9);
+        }
+        /*!!!!!!!!!!!DANGER FIX THIS!!!!!!!!!!!!*/
+        $nonce = '9843787448916803398229937674313';
+        return $nonce;
     }
 
 }
