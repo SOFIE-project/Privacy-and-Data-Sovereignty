@@ -18,6 +18,7 @@
 
         $server = new OAuth2\Server($storage, array(
             'use_jwt_access_tokens' => true,
+            'issuer'=>'NKGKtcNwssToP5f7uhsEs4',
         ));
         $server->addGrantType(new OAuth2\GrantType\VerifiableCredentials($storage, array('issuer_did'=>'NKGKtcNwssToP5f7uhsEs4')));
         $server->handleTokenRequest(OAuth2\Request::createFromGlobals())->send();

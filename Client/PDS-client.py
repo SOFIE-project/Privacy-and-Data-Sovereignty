@@ -15,16 +15,20 @@ pool_genesis_txn_path = os.getcwd()+ conf['pool_genesis_txn_path']
 
 user = conf['user']
 
-async def get_token(as_url):
-    grant_type = {'grant_type':'verifiable_credentials'}
-    proof_req  = requests.post(as_url, data = grant_type).text
+async def get_token(as_url, aud="", sub=""):
+    post_data = {'grant_type':'verifiable_credentials'}
+    proof_req  = requests.post(as_url, data = post_data).text
     print("<---------")
     print ("Received proof request: " + proof_req)
     proof = await generate_proof(proof_req)
     print("--------->")
     print ("Will respond with: " + proof)
-    token_request ={'grant_type':'verifiable_credentials','aud':'sofie-iot.eu', 'sub':'myidentifier','proof':proof}
-    token  = requests.post(as_url, data = token_request).text
+    post_data.update({'proof':proof})
+    if aud:
+        post_data.update({'aud':aud})
+    if sub:
+        post_data.update({'sub':sub})
+    token  = requests.post(as_url, data = post_data).text
     print("<---------")
     print ("Received token: " + token)
 
@@ -53,9 +57,12 @@ async def generate_proof(proof_req):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-a', '--authorize', type=str, help="Receive token from the provided authorisation server")
+    parser.add_argument('-t', '--target', type=str, help="The aud field of the JWT", default="")
+    parser.add_argument('-s', '--sub', type=str, help="The sub field of the JWT", default="")
+    args = parser.parse_args()
     if (args.authorize):
         loop = asyncio.get_event_loop()
-        loop.run_until_complete(get_token(args.authorize))
+        loop.run_until_complete(get_token(args.authorize, args.target, args.sub))
         loop.close()
 
 if __name__ == '__main__':

@@ -66,9 +66,9 @@ class VerifiableCredentials implements GrantTypeInterface, ClientAssertionTypeIn
     {
         $cred_def_id = $request->request('cred_def_id');
         $proof       = $request->request('proof');
-        $scope       = $request->request('scope');
-        $clientId    = $request->request('aud');
-        $userId      = $request->request('sub');
+        $this->scope       = $request->request('scope');
+        $this->clientId    = $request->request('aud');
+        $this->userId      = $request->request('sub');
         if($proof)
         {
             $proof_request = $this->generate_proof_request();
