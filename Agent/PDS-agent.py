@@ -13,7 +13,8 @@ import asyncio
 import os
 import argparse  
 
-with open('./agent.conf') as f:
+dir_path = os.path.dirname(os.path.realpath(__file__))
+with open(dir_path+'/agent.conf') as f:
     conf = json.load(f)
 
 async def verify_proof(proof_req, proof):
