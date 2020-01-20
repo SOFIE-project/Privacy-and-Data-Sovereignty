@@ -69,7 +69,10 @@ The setup script creates a verifiable credential for a testing client. To achiev
 * docker build -f ci/indy-pool.dockerfile -t indy_pool . 
 
 ### Configuration
-
+A basic configuration for testing purposes can be generated as follows:
+* Run Hyperledger Indy docker-based testing pool by executing  docker run -itd -p 9701-9708:9701-9708 indy_pool
+* From the test directory run python3 setup.py
+* Copy the generated client.conf in the Client directory and agent.conf in the Agent directory
 
 
 ## Testing
