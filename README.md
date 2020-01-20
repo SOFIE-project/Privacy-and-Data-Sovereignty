@@ -12,17 +12,14 @@ The PDS component is composed of 5 sub-scomponents: Client, Smart contracts, IAA
 #### Client
 This this sub-component includes libraries that can be used by an external client application in order to access a platform using the PDS component. 
 
-#### Smart contracts
-The PDS component currently includes a single Ethereum smart contract which manages the “access control delegation” functionality of the component. The principal operation of this smart contract is that it allows resource owners to register the addresses of the authorisation servers that are responsible for managing their resources
-
 #### PDS blockchain agent
 Similarly to the [IAA component](https://github.com/SOFIE-project/IAA), this sub-component includes a blockchain agent entity that mediates the communication between the authorisation server (see next), the authorisation delegation smart contract, and the Hyperledger Indy pool
 
 #### Authorization server
 This entity is an enhanced version of the [OAuth2 php server](https://github.com/bshaffer/oauth2-server-php). It supports verfiable credentials and access control delegation. 
 
-### IoT platform
-A sample IoT platform used for testing pursposed. 
+#### Setup script
+The setup script creates configurations that can be used for testing with Hyperledger Indy docker-based testing pool
 
 
 ### Relation with SOFIE
@@ -46,28 +43,29 @@ The following table includes the key technologies used for each sub-component
 
 
 ## Installation
-
+The following instruction have been tested for Ubuntu 18.04
 ### Prerequisites
 
 #### Client
 Python 3 is required
 
-#### Smart contracts
-Smart contracts should be installed in an Ethereum network. 
-
 #### PDS blockchain agent
-Python 3 is required 
+Python 3, Hyperledger Indy SDK, and the python wrapper are required 
+* sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys CE7709D068DB5E88
+* sudo add-apt-repository "deb https://repo.sovrin.org/sdk/deb bionic stable"
+* sudo apt-get update
+* sudo apt-get install -y libindy
+* pip3 install install python3-indy
+
 
 #### Authorization server
-The Authorization-server fodler should be stored in a web server that supports php and python 3, so it can be accessed over HTTP(s) (NOTE accessing the Authorization server is not secure).
+The Authorization-server folder should be stored in a web server that supports php and python 3, so it can be accessed over HTTP(s) (NOTE accessing the Authorization server is not secure). For testing purposes the php build-in server can be used. 
+
+#### Setup script
+
 
 ### Configuration
 
-The setup folder contains some setup scripts that must be run only once. These scipts set up the pool, the corresponding wallets, and DIDs. These scripts assume an existing pool of Indy nodes. Moreover, these scripts require Indy-SDK. In all python files replace the variables pool_name and pool_genesis_txn_path with the correct values. Edit the file setup/1.setup_pool_and_wallets.py and modify the variables steward_id, steward_seed and steward_conf_did accordingly. Then run this scipt.
-
-As a next step run the script setup/2.create_schema_and_credentials.py This script will output some python code. This code should be tranferred to the following files: setup/3.issue_credentials.py, Clinet/client.py and Agent/PDS-DIDagent.py.
-
-Finally, execute the script setup/3.issue_credentials.py
 
 
 ## Testing
