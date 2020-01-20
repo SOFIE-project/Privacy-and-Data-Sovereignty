@@ -82,7 +82,7 @@ Run Authorization Server
 * php -S localhost:8000 
 Run the client
 * cd Client
-* python3 PDS-client.py  -a http://localhost:8000 -t in.gr -s mydid
+* python3 PDS-client.py  -a http://localhost:8000 -t sofie-iot.eu -s mydid
 
 
 ## Integration
