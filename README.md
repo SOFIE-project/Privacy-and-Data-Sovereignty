@@ -29,14 +29,13 @@ More information about this component and its relation to the SOFIE project can 
 
 ### Key Technologies
 
-The following table includes the key technologies used for each sub-component
+The following table includes the key technologies used for each component's modules
 
 | Sub-component | Technologies |
 | ------------- | ------------- |
 | Client  | Hyper Ledger Indy python SDK |
-| Smart contracts  | Solidity  |
-| PDS blockchain agent  | Hyper Ledger Indy pyhton SDK   |
-| Authorization server  | php compatilbe web server, OAuth2 |
+| PDS blockchain agent  | Hyper Ledger Indy python SDK   |
+| Authorization server  | php compatible web server, OAuth2 |
 
 
 ## Usage
