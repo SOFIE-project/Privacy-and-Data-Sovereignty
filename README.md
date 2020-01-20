@@ -82,7 +82,7 @@ Run Authorization Server
 * php -S localhost:8000 
 Run the client
 * cd Client
-* python3 pds-client.py
+* python3 PDS-client.py
 
 
 ## Integration
