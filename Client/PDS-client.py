@@ -5,8 +5,8 @@ import json
 import sys
 import asyncio
 import os
+import argparse
 
-as_url = 'http://localhost:8000'
 
 with open('client.conf') as f:
     conf = json.load(f)
@@ -15,7 +15,7 @@ pool_genesis_txn_path = os.getcwd()+ conf['pool_genesis_txn_path']
 
 user = conf['user']
 
-async def get_resource():
+async def get_token(as_url):
     grant_type = {'grant_type':'verifiable_credentials'}
     proof_req  = requests.post(as_url, data = grant_type).text
     print("<---------")
@@ -51,9 +51,12 @@ async def generate_proof(proof_req):
 
 
 def main():
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(get_resource())
-    loop.close()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-a', '--authorize', type=str, help="Receive token from the provided authorisation server")
+    if (args.authorize):
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(get_token(args.authorize))
+        loop.close()
 
 if __name__ == '__main__':
     main()
