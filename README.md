@@ -13,10 +13,10 @@ The PDS component is composed of 5 sub-scomponents: Client, Smart contracts, IAA
 This this sub-component includes libraries that can be used by an external client application in order to access a platform using the PDS component. 
 
 #### PDS blockchain agent
-Similarly to the [IAA component](https://github.com/SOFIE-project/IAA), this sub-component includes a blockchain agent entity that mediates the communication between the authorisation server (see next), the authorisation delegation smart contract, and the Hyperledger Indy pool
+This module is used for verifying VCs
 
 #### Authorization server
-This entity is an enhanced version of the [OAuth2 php server](https://github.com/bshaffer/oauth2-server-php). It supports verfiable credentials and access control delegation. 
+This entity is an enhanced version of the [OAuth2 php server](https://github.com/bshaffer/oauth2-server-php). It supports verifiable credentials and access control delegation. 
 
 #### Setup script
 The setup script creates configurations that can be used for testing with Hyperledger Indy docker-based testing pool
@@ -24,7 +24,7 @@ The setup script creates configurations that can be used for testing with Hyperl
 
 ### Relation with SOFIE
 
-Nore information about this compoment and its relation to the SOFIE project can be found in [D2.5 Federation Framework, SOFIE deliverable](https://media.voog.com/0000/0042/0957/files/SOFIE_D2.5-Federation_Framework%2C_2nd_version.pdf)
+More information about this component and its relation to the SOFIE project can be found in [D2.5 Federation Framework, SOFIE deliverable](https://media.voog.com/0000/0042/0957/files/SOFIE_D2.5-Federation_Framework%2C_2nd_version.pdf)
 
 
 ### Key Technologies
@@ -62,7 +62,11 @@ Python 3, Hyperledger Indy SDK, and the python wrapper are required
 The Authorization-server folder should be stored in a web server that supports php and python 3, so it can be accessed over HTTP(s) (NOTE accessing the Authorization server is not secure). For testing purposes the php build-in server can be used. 
 
 #### Setup script
-
+The setup script creates a verifiable credential for a testing client. To achieve this it uses Hyperledger Indy docker-based testing pool, it creates the necessary wallets, and it outputs two configuration files: one that should be used with the client and another for the PDS agent. It has the same prerequisites as the PDS blockchain agent. To install Hyperledger Indy docker-based testing pool the following steps are required:
+* git clone https://github.com/hyperledger/indy-sdk.git
+* cd indy-sdk/
+* checkout rc
+* docker build -f ci/indy-pool.dockerfile -t indy_pool . 
 
 ### Configuration
 
