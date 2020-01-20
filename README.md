@@ -75,8 +75,14 @@ A basic configuration for testing purposes can be generated as follows:
 
 
 ## Testing
-
-To be provided 
+Run Hyperledger Indy docker-based testing pool by executing  
+* docker run -itd -p 9701-9708:9701-9708 indy_pool
+Run Authorization Server
+* cd AuthAuthorization-Server/
+* php -S localhost:8000 
+Run the client
+* cd Client
+* python3 pds-client.py
 
 
 ## Integration
