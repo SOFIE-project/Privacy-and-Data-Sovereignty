@@ -1,5 +1,5 @@
 from indy import did,wallet,crypto
-from PDS import agent
+from PDS import pds
 import pytest
 import asyncio
 import json
@@ -24,11 +24,13 @@ server = {
 
 @pytest.mark.asyncio
 async def test_valid_did():
-    challenge = '9843787448916803398229937674313'
+    code, response = await pds.Indy.verify_did(user['did'])
+    assert (code == 401)
+    challenge = response['challenge']
     wallet_handle = await wallet.open_wallet(user['wallet_config'], user['wallet_credentials'])
     verkey = await did.key_for_local_did(wallet_handle, user['did'])
     signature = await crypto.crypto_sign(wallet_handle, verkey, challenge.encode())
     signature64 = base64.b64encode(signature)
-    code = await agent.verify_did(user['did'], challenge, signature64, server['wallet_config'], server['wallet_credentials'], True)
+    code, response = await pds.Indy.verify_did(user['did'], challenge, signature64, server['wallet_config'], server['wallet_credentials'], True)
     assert (code == 200)
     await wallet.close_wallet(wallet_handle)
