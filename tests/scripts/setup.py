@@ -12,22 +12,29 @@ This Steward is part of the indy-sdk testing network
 '''
 steward = {
     'name': "Steward",
-    'wallet_config': json.dumps({'id': 'steward_wallet'}),
+    'wallet_config': json.dumps({'id': 'steward_wallet', "storage_config":{"path":"indy_wallets"}}),
     'wallet_credentials': json.dumps({'key': 'steward_wallet_key'}),
     'seed': '000000000000000000000000Steward1'
 }
 
 endorser = {
     'name': "Endorser",
-    'wallet_config': json.dumps({'id': 'endorser_wallet'}),
+    'wallet_config': json.dumps({'id': 'endorser_wallet', "storage_config":{"path":"indy_wallets"}}),
     'wallet_credentials': json.dumps({'key': 'endorser_wallet_key'}),
     'seed': '00000000000000000000000Endorser1' #used only for testing
 }
 
 user = {
-    'wallet_config': json.dumps({'id': 'user_wallet'}),
+    'wallet_config': json.dumps({'id': 'user_wallet', "storage_config":{"path":"indy_wallets"}}),
     'wallet_credentials': json.dumps({'key': 'user_wallet_key'}),
     'seed': '000000000000000000000000000User1', #used only for testing
+    'msk' : 'msk_key'
+}
+
+server = {
+    'wallet_config': json.dumps({'id': 'as_wallet',"storage_config":{"path":"indy_wallets"}}),
+    'wallet_credentials': json.dumps({'key': 'server_wallet_key'}),
+    'seed': '0000000000000000000000000Server1', #used only for testing
     'msk' : 'msk_key'
 }
 
@@ -118,10 +125,28 @@ async def setup():
     cred, _, _ = await anoncreds.issuer_create_credential(endorser['wallet'], cred_offer, cred_req, cred_values, None, None)
     await anoncreds.prover_store_credential(user['wallet'], None, cred_req_metadata, cred, cred_def, None)
     #################################################
+    '''
+    The following is used for verifying DIDs without the pool
+    '''
+    print("11. Creating server wallet")
+    try:
+        await wallet.create_wallet(server['wallet_config'], server['wallet_credentials'])
+    except IndyError as ex:
+        if ex.error_code == ErrorCode.WalletAlreadyExistsError:
+            pass
+    #################################################
+    '''
+    The following is used for verifying DIDs without the pool
+    '''
+    print("12. Storing user verkey in server's wallet")
+    server['wallet'] = await wallet.open_wallet(server['wallet_config'], server['wallet_credentials'])
+    await did.store_their_did(server['wallet'],json.dumps({"did": user['did'], "verkey": user['key']})) 
+    #################################################
     print("Cleaning up")
     await wallet.close_wallet(steward['wallet'])
     await wallet.close_wallet(endorser['wallet'])
     await wallet.close_wallet(user['wallet'])
+    await wallet.close_wallet(server['wallet'])
     await pool.close_pool_ledger(pool_handle)
     
     print("Creating client configuration file")
@@ -130,12 +155,12 @@ async def setup():
     conf['cred_def']       = cred_def
     conf['cred_schema_id'] = cred_schema_id
     conf['cred_schema']    = cred_schema
-    with open('agent.conf', 'w') as f:
+    with open('conf/agent.conf', 'w') as f:
         json.dump(conf,f)
     conf['pool_name']      = pool_name
     conf['pool_genesis_txn_path'] = '/indy_sample_genesis_txn'
     conf['user']          = user
-    with open('client.conf', 'w') as f:
+    with open('conf/client.conf', 'w') as f:
         json.dump(conf,f)
 
 def main():
