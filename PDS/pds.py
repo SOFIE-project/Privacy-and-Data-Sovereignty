@@ -24,6 +24,7 @@ class Indy:
             wallet_handle = await wallet.open_wallet(wallet_config, wallet_credentials)
             if (only_wallet_lookup):
                 verkey = await did.key_for_local_did(wallet_handle, client_did)
+                await wallet.close_wallet(wallet_handle)
             else:
                 verkey = ""
             #Add code to check if verkey exists
@@ -82,7 +83,7 @@ def main():
         sys.exit()
     with open(sys.argv[1]) as f:
         conf = json.load(f)
-    httpd = HTTPServer(('localhost', conf["port"]), PDSHandler)
+    httpd = HTTPServer(('', conf["port"]), PDSHandler)
     try:
         httpd.serve_forever()
     except KeyboardInterrupt:

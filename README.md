@@ -27,15 +27,17 @@ Python 3, Hyperledger Indy SDK and the python wrapper, PyJWT are required. Use t
 * sudo add-apt-repository "deb https://repo.sovrin.org/sdk/deb bionic stable"
 * sudo apt-get update
 * sudo apt-get install -y libindy
-* pip3 install install python3-indy
-* pip3 install pyjwt
+* pip3 install python3-indy pyjwt web3
 
 
 ### Configuration
 A sample configuration file is provided at conf/sample.conf
 
-### Execution
-From the root directory run `python3 PDS/pds.py <configuration file>` e.g., `python3 PDS/pds.py conf/sample.conf`
+### Execution from source
+From the root directory run `python3 PDS/pds.py <configuration file>` e.g., `python3 PDS/pds.py conf/pdf.conf`
+
+### Dockerized version
+In order to build PDS image, execute the script `docker-build.sh`. Then you can run PDS using, for example,  `docker run -tid --rm -p 9001:9001 pds`. You can verfiry that PDS is running properly be executing in the examples folder: `python3 get_token.py`
 
 ### Usage
 The executed script creates an HTTP server that listens for REST API calls at port 9001. The REST API of PDS component is documented in 
