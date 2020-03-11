@@ -1,4 +1,7 @@
-from PDS import pds
+import sys, os
+myPath = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, myPath + '/../PDS/')
+
 from indy import did,wallet,crypto
 import pytest
 import requests
