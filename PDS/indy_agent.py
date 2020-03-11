@@ -2,11 +2,23 @@ from indy import did,wallet,crypto
 import asyncio
 import base64
 import random
+import json
 
 class Indy:
     @staticmethod
     def create_nonce(length=30):
         return ''.join([str(random.randint(0, 9)) for i in range(length)])
+
+    @staticmethod
+    async def add_did_to_wallet(wallet_handle, ndid, verkey="", metadata=""):
+        await did.store_their_did(wallet_handle,json.dumps({"did": ndid, "verkey": verkey}))
+        await did.set_did_metadata(wallet_handle, ndid, metadata)
+        return 200, {'code':200,'message':'Success'}
+
+    @staticmethod
+    async def get_did_metadata(wallet_handle, ndid):
+        metadata = await did.get_did_metadata(wallet_handle, ndid)
+        return 200, {'code':200,'message':metadata}
 
     @staticmethod
     async def verify_did(client_did, challenge = None, signature=None, wallet_handle="", pool_handle="", only_wallet_lookup=False, user_generated_challenge=False):
