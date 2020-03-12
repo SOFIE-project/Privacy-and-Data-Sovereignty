@@ -46,7 +46,7 @@ class PDSHandler(BaseHTTPRequestHandler):
                         as_private_key = file.read()
                     code, output = PDS.generate_token(as_private_key, target)
             self.send_response(code)
-            self.send_header('Content-type','application/json'.encode())
+            self.send_header('Content-type','application/json')
             self.end_headers()
             self.wfile.write(json.dumps(output).encode())
 
