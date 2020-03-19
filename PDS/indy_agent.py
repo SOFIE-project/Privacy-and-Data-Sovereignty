@@ -21,6 +21,17 @@ class Indy:
         return 200, {'code':200,'message':metadata}
 
     @staticmethod
+    async def encrypt_for_did(client_did, message, wallet_handle="", pool_handle="", only_wallet_lookup=False):
+        if (client_did != None and wallet_handle!= None):
+            if (only_wallet_lookup):
+                verkey = await did.key_for_local_did(wallet_handle, client_did)
+            else:
+                verkey = ""
+            #Add code to check if verkey exists
+        enc = await crypto.anon_crypt(verkey, message.encode())
+        return 200, {'code':200,'message': base64.urlsafe_b64encode(enc).decode()}
+
+    @staticmethod
     async def verify_did(client_did, challenge = None, signature=None, wallet_handle="", pool_handle="", only_wallet_lookup=False, user_generated_challenge=False):
         if (client_did !=None and challenge == None):
             return 401, {'code':401, 'message' : 'Proof required','challenge': Indy.create_nonce()}

@@ -56,3 +56,17 @@ async def test_add_did():
     assert (code == 200)
     await wallet.close_wallet(wallet_handle)
     await wallet.close_wallet(server_wallet_handle)
+
+@pytest.mark.asyncio
+async def test_encrypt():
+    wallet_handle = await wallet.open_wallet(user['wallet_config'], user['wallet_credentials'])
+    verkey = await did.key_for_local_did(wallet_handle, user['did'])
+    server_wallet_handle = await wallet.open_wallet( server['wallet_config'], server['wallet_credentials'])
+    code, response = await Indy.encrypt_for_did(user['did'], "Hello World",server_wallet_handle,"", True)
+    assert (code == 200)
+    enc64 = response['message']
+    enc   = base64.urlsafe_b64decode(enc64)
+    msg   = await crypto.anon_decrypt (wallet_handle, verkey, enc)
+    assert (msg.decode() == "Hello World")
+    await wallet.close_wallet(wallet_handle)
+    await wallet.close_wallet(server_wallet_handle)

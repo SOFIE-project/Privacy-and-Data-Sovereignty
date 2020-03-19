@@ -15,9 +15,20 @@ pool_handle = ""
 
 class PDS:
     @staticmethod
-    def generate_token(private_key, audience=None):
+    def generate_token(private_key, audience=None,  subject=None, token_type=None ):
         token = jwt.encode({'aud': 'sofie-iot.eu'},private_key, algorithm='RS256')
-        return 200, {'code':200,'message':token.decode('utf-8')}
+        if token_type == None:
+            return 200, {'code':200,'message':token.decode('utf-8')}
+        if token_type == "DID-encrypted":
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            code, output = loop.run_until_complete(
+                Indy.encrypt_for_did(subject, token.decode('utf-8'),wallet_handle,pool_handle, True)
+            )
+            loop.close()
+            return code, output
+
+
 class PDSHandler(BaseHTTPRequestHandler):
     def do_POST(self):
         path = self.path
@@ -30,21 +41,31 @@ class PDSHandler(BaseHTTPRequestHandler):
                 environ={'REQUEST_METHOD':'POST',
                         'CONTENT_TYPE':self.headers['Content-Type'],
                         })
-            type  = form.getvalue("grant-type")
-            grant = form.getvalue("grant")
-            challenge = form.getvalue("challenge")
-            proof = form.getvalue("proof")
-            target = form.getvalue("target")
-            if (type == "DID"):
+            grant_type  = form.getfirst("grant-type", None)
+            grant       = form.getfirst("grant", None)
+            challenge   = form.getfirst("challenge", None)
+            proof       = form.getfirst("proof", None)
+            target      = form.getfirst("target", None)
+            token_type  = form.getfirst("token-type", None)
+            subject     = form.getfirst("subject", None)
+            if (grant_type == "DID"):
                 loop = asyncio.new_event_loop()
                 asyncio.set_event_loop(loop)
+                '''
+                print("POST parameters:")
+                print(grant)
+                print(challenge)
+                print(proof)
+                print(token_type)
+                print(subject)
+                '''
                 code, output = loop.run_until_complete(
                     Indy.verify_did(grant, challenge, proof, wallet_handle,pool_handle, True))
                 loop.close()
                 if (code == 200):
                     with open(conf['as_private_key'], mode='rb') as file: 
                         as_private_key = file.read()
-                    code, output = PDS.generate_token(as_private_key, target)
+                    code, output = PDS.generate_token(as_private_key, target, subject, token_type)
             self.send_response(code)
             self.send_header('Content-type','application/json')
             self.end_headers()
