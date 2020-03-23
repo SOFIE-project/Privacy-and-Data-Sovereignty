@@ -56,7 +56,15 @@ Tests are executed using pytest and pytest-asyncio. To install it execute
 * pip3 install -U pytest 
 * pip3 install pytest-asyncio
 
+Testing using Hyperledger Indy requires an Indy pool. The provided tests are configured with the sample Indy pool included in the docker file locates in tests folder. To install it go to tests folder and execute
+
+* docker build -f indy-pool.dockerfile -t indy_pool .
+
 ### Running the tests
+Run the testing Indy pool built with the previous step by executing:
+
+* docker run --name test_pool -itd -p 9701-9708:9701-9708 indy_pool
+
 From the root directory run `python3 -m pytest -s  tests/`
 
 
