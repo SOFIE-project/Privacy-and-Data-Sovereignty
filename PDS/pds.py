@@ -48,6 +48,7 @@ class PDSHandler(BaseHTTPRequestHandler):
             target      = form.getfirst("target", None)
             token_type  = form.getfirst("token-type", None)
             subject     = form.getfirst("subject", None)
+            log_token   = form.getfirst("log-token", False)
             if (grant_type == "DID"):
                 loop = asyncio.new_event_loop()
                 asyncio.set_event_loop(loop)
@@ -62,10 +63,12 @@ class PDSHandler(BaseHTTPRequestHandler):
                 code, output = loop.run_until_complete(
                     Indy.verify_did(grant, challenge, proof, wallet_handle,pool_handle, True))
                 loop.close()
-                if (code == 200):
-                    with open(conf['as_private_key'], mode='rb') as file: 
-                        as_private_key = file.read()
-                    code, output = PDS.generate_token(as_private_key, target, subject, token_type)
+            if (grant_type == "auth_code"):
+                code = 200
+            if (code == 200):
+                with open(conf['as_private_key'], mode='rb') as file: 
+                    as_private_key = file.read()
+                code, output = PDS.generate_token(as_private_key, target, subject, token_type)
             self.send_response(code)
             self.send_header('Content-type','application/json')
             self.end_headers()

@@ -50,6 +50,9 @@ Please select **schema** to see all available API parameters and their documenta
 ## Testing
 
 ### Prerequisites
+For testing purposes ganache-cli is required. To install it execute:
+
+* npm install -g ganache-cli
 
 Tests are executed using pytest and pytest-asyncio. To install it execute 
 
@@ -64,6 +67,10 @@ Testing using Hyperledger Indy requires an Indy pool. The provided tests are con
 Run the testing Indy pool built with the previous step by executing:
 
 * docker run --name test_pool -itd -p 9701-9708:9701-9708 indy_pool
+
+Run ganache-cli by executing
+
+* ganache-cli
 
 From the root directory run `python3 -m pytest -s  tests/`
 
