@@ -15,8 +15,15 @@ pool_handle = ""
 
 class PDS:
     @staticmethod
-    def generate_token(private_key, audience=None,  subject=None, token_type=None ):
-        token = jwt.encode({'aud': 'sofie-iot.eu'},private_key, algorithm='RS256')
+    def generate_token(private_key, audience=None,  subject=None, expires=None, token_type=None ):
+        claims = {}
+        if audience:
+            claims['aud'] = audience
+        if subject:
+            claims['sub'] = subject
+        if expires:
+            claims['exp'] = expires
+        token = jwt.encode(claims,private_key, algorithm='RS256')
         if token_type == None:
             return 200, {'code':200,'message':token.decode('utf-8')}
         if token_type == "DID-encrypted":
@@ -49,6 +56,7 @@ class PDSHandler(BaseHTTPRequestHandler):
             token_type  = form.getfirst("token-type", None)
             subject     = form.getfirst("subject", None)
             log_token   = form.getfirst("log-token", False)
+            expires   = form.getfirst("expires", None)
             if (grant_type == "DID"):
                 loop = asyncio.new_event_loop()
                 asyncio.set_event_loop(loop)
@@ -68,7 +76,7 @@ class PDSHandler(BaseHTTPRequestHandler):
             if (code == 200):
                 with open(conf['as_private_key'], mode='rb') as file: 
                     as_private_key = file.read()
-                code, output = PDS.generate_token(as_private_key, target, subject, token_type)
+                code, output = PDS.generate_token(as_private_key, target, subject, expires, token_type)
             self.send_response(code)
             self.send_header('Content-type','application/json')
             self.end_headers()

@@ -31,7 +31,7 @@ async def test_valid_did():
         'wallet_credentials': json.dumps({'key': 'user_wallet_key'}),
         'did' : '4qk3Ab43ufPQVif4GAzLUW'
     }
-    payload = {'grant-type':'DID', 'grant':user['did'], 'target':"sofie-iot.eu"}
+    payload = {'grant-type':'DID', 'grant':user['did'], 'target':'smartlocker1'}
     response  = requests.post("http://localhost:9001/gettoken", data = payload).text
     response =json.loads(response)
     assert(response['code'] == 401)
@@ -40,7 +40,8 @@ async def test_valid_did():
     verkey = await did.key_for_local_did(wallet_handle, user['did'])
     signature = await crypto.crypto_sign(wallet_handle, verkey, challenge.encode())
     signature64 = base64.b64encode(signature)
-    payload = {'grant-type':'DID', 'grant':user['did'], 'challenge': challenge, 'proof':signature64, 'target':'sofie-iot.eu'}
+    exp = time.mktime(datetime.datetime(2020, 4, 1, 23, 59).timetuple())
+    payload = {'grant-type':'DID', 'grant':user['did'], 'challenge': challenge, 'proof':signature64, 'target':'smartlocker1', 'expires':exp, 'subject': user['did']}
     response  = requests.post("http://localhost:9001/gettoken", data = payload).text
     response =json.loads(response)
     assert(response['code'] == 200)
