@@ -1,4 +1,4 @@
-from http.server import BaseHTTPRequestHandler, HTTPServer
+from werkzeug.wrappers import Request, Response
 from indy import did,wallet,crypto
 from indy_agent import Indy
 import cgi
@@ -13,70 +13,49 @@ conf = {}
 wallet_handle = ""
 pool_handle = ""
 
-class PDSAdminHandler(BaseHTTPRequestHandler):
-    def do_POST(self):
-        path = self.path
-        if path == "/add":
-            code = 403
-            output = {'code':403, 'message':'Invalide or missing input parameters'}
-            form = cgi.FieldStorage(
-                fp = self.rfile, 
-                headers=self.headers,
-                environ={'REQUEST_METHOD':'POST',
-                        'CONTENT_TYPE':self.headers['Content-Type'],
-                        })
-            ndid  = form.getfirst("did","")
-            verkey = form.getfirst("verkey","")
-            metadata = form.getfirst("metadata","")
-            if (ndid !=""):
-                loop = asyncio.new_event_loop()
-                asyncio.set_event_loop(loop)
-                code, output = loop.run_until_complete(
-                    Indy.add_did_to_wallet(wallet_handle, ndid, verkey, metadata))
-            self.send_response(code)
-            self.send_header('Content-type','application/json')
-            self.end_headers()
-            self.wfile.write(json.dumps(output).encode())
-        if path == "/get":
-            code = 403
-            output = {'code':403, 'message':'Invalide or missing input parameters'}
-            form = cgi.FieldStorage(
-                fp = self.rfile, 
-                headers=self.headers,
-                environ={'REQUEST_METHOD':'POST',
-                        'CONTENT_TYPE':self.headers['Content-Type'],
-                        })
-            ndid  = form.getfirst("did","")
-            if (ndid !=""):
-                loop = asyncio.new_event_loop()
-                asyncio.set_event_loop(loop)
-                code, output = loop.run_until_complete(
-                    Indy.get_did_metadata(wallet_handle, ndid))
-            self.send_response(code)
-            self.send_header('Content-type','application/json')
-            self.end_headers()
-            self.wfile.write(json.dumps(output).encode())
+class PDSAdminHandler():
+    def __init__(self):
+        with open('conf/pds.conf') as f:
+            self.conf = json.load(f)
+        loop = asyncio.get_event_loop()
+        self.wallet_handle = loop.run_until_complete(wallet.open_wallet(json.dumps(self.conf['wallet_config']), json.dumps(self.conf['wallet_credentials'])))
+        self.pool_handle = None
 
-def main():
-    global conf
-    global wallet_handle
-    global pool_handle
-    if len(sys.argv) != 2:
-        print ("Usage pds.py <configuration file>")
-        sys.exit()
-    with open(sys.argv[1]) as f:
-        conf = json.load(f)
-    httpadmin = HTTPServer(('', conf["adminport"]), PDSAdminHandler)
-    loop = asyncio.get_event_loop()
-    wallet_handle = loop.run_until_complete(wallet.open_wallet(json.dumps(conf['wallet_config']), json.dumps(conf['wallet_credentials'])))
-    
-    try:
-        httpadmin.serve_forever()
-    except KeyboardInterrupt:
-        pass
-    httpadmin.server_close()
-  
-    loop.run_until_complete(wallet.close_wallet(wallet_handle))
+    def wsgi_app(self, environ, start_response):
+        req  = Request(environ)
+        form = req.form
+        code = 403
+        output = {'code':403, 'message':'Invalide action'}
+        action = form.get("action")
+        ndid  = form.get("did","")
+        verkey = form.get("verkey","")
+        metadata = form.get("metadata","")
+        if action == "add":
+            if (ndid !=""):
+                loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(loop)
+                code, output = loop.run_until_complete(
+                    Indy.add_did_to_wallet(self.wallet_handle, ndid, verkey, metadata))
+        elif action == "get":
+            if (ndid !=""):
+                loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(loop)
+                code, output = loop.run_until_complete(
+                    Indy.get_did_metadata(self.wallet_handle, ndid))
+        response = Response(json.dumps(output).encode(), status=code, mimetype='application/json')
+        return response(environ, start_response)
+
+    def __call__(self, environ, start_response):
+        return self.wsgi_app(environ, start_response)
+
+def create_app():
+    app = PDSAdminHandler()
+    return app
+
+def main(): 
+    from werkzeug.serving import run_simple
+    app = create_app()
+    run_simple('127.0.0.1', 9002, app)
 
 
 if __name__ == '__main__':

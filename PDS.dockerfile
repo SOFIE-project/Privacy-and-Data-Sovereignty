@@ -11,6 +11,7 @@ RUN add-apt-repository "deb https://repo.sovrin.org/sdk/deb bionic stable"
 RUN apt update
 RUN apt install -y libindy python3-pip
 RUN pip3 install python3-indy pyjwt web3
+RUN pip3 install Werkzeug
 
 COPY PDS/ PDS/
 COPY conf/ conf/

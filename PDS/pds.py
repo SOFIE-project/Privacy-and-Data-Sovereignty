@@ -1,4 +1,4 @@
-from http.server import BaseHTTPRequestHandler, HTTPServer
+from werkzeug.wrappers import Request, Response
 from indy import did,wallet,crypto
 from indy_agent import Indy
 import cgi
@@ -9,13 +9,12 @@ import base64
 import sys
 import jwt
 
-conf = {}
-wallet_handle = ""
-pool_handle = ""
-
 class PDS:
-    @staticmethod
-    def generate_token(private_key, audience=None,  subject=None, expires=None, token_type=None ):
+    def __init__(self, wallet_handle, pool_handle):
+        self.wallet_handle = wallet_handle
+        self.pool_handle = pool_handle
+
+    def generate_token(self, private_key, audience=None,  subject=None, expires=None, token_type=None ):
         claims = {}
         if audience:
             claims['aud'] = audience
@@ -30,76 +29,71 @@ class PDS:
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
             code, output = loop.run_until_complete(
-                Indy.encrypt_for_did(subject, token.decode('utf-8'),wallet_handle,pool_handle, True)
+                Indy.encrypt_for_did(subject, token.decode('utf-8'), self.wallet_handle, self.pool_handle, True)
             )
             loop.close()
             return code, output
 
 
-class PDSHandler(BaseHTTPRequestHandler):
-    def do_POST(self):
-        path = self.path
-        if path == "/gettoken":
-            code = 403
-            output = {'code':403, 'message':'Invalide or missing input parameters'}
-            form = cgi.FieldStorage(
-                fp = self.rfile, 
-                headers=self.headers,
-                environ={'REQUEST_METHOD':'POST',
-                        'CONTENT_TYPE':self.headers['Content-Type'],
-                        })
-            grant_type  = form.getfirst("grant-type", None)
-            grant       = form.getfirst("grant", None)
-            challenge   = form.getfirst("challenge", None)
-            proof       = form.getfirst("proof", None)
-            target      = form.getfirst("target", None)
-            token_type  = form.getfirst("token-type", None)
-            subject     = form.getfirst("subject", None)
-            log_token   = form.getfirst("log-token", False)
-            expires   = form.getfirst("expires", None)
-            if (grant_type == "DID"):
-                loop = asyncio.new_event_loop()
-                asyncio.set_event_loop(loop)
-                '''
-                print("POST parameters:")
-                print(grant)
-                print(challenge)
-                print(proof)
-                print(token_type)
-                print(subject)
-                '''
-                code, output = loop.run_until_complete(
-                    Indy.verify_did(grant, challenge, proof, wallet_handle,pool_handle, True))
-                loop.close()
-            if (grant_type == "auth_code"):
-                code = 200
-            if (code == 200):
-                with open(conf['as_private_key'], mode='rb') as file: 
-                    as_private_key = file.read()
-                code, output = PDS.generate_token(as_private_key, target, subject, expires, token_type)
-            self.send_response(code)
-            self.send_header('Content-type','application/json')
-            self.end_headers()
-            self.wfile.write(json.dumps(output).encode())
+class PDSHandler():
+    def __init__(self):
+        with open('conf/pds.conf') as f:
+            self.conf = json.load(f)
+        loop = asyncio.get_event_loop()
+        self.wallet_handle = loop.run_until_complete(wallet.open_wallet(json.dumps(self.conf['wallet_config']), json.dumps(self.conf['wallet_credentials'])))
+        self.pool_handle = None
+        self.pds = PDS(self.wallet_handle, self.pool_handle)
 
-def main():
-    global conf
-    global wallet_handle
-    global pool_handle
-    if len(sys.argv) != 2:
-        print ("Usage pds.py <configuration file>")
-        sys.exit()
-    with open(sys.argv[1]) as f:
-        conf = json.load(f)
-    httpd     = HTTPServer(('', conf["port"]), PDSHandler)
-    loop = asyncio.get_event_loop()
-    wallet_handle = loop.run_until_complete(wallet.open_wallet(json.dumps(conf['wallet_config']), json.dumps(conf['wallet_credentials'])))
-    try:
-        httpd.serve_forever()
-    except KeyboardInterrupt:
-        pass
-    httpd.server_close()
-    loop.run_until_complete(wallet.close_wallet(wallet_handle))
+    def wsgi_app(self, environ, start_response):
+        req  = Request(environ)
+        form = req.form
+        code = 403
+        output = {'code':403, 'message':'Invalide or missing input parameters'}
+
+        grant_type  = form.get("grant-type", None)
+        grant       = form.get("grant", None)
+        challenge   = form.get("challenge", None)
+        proof       = form.get("proof", None)
+        target      = form.get("target", None)
+        token_type  = form.get("token-type", None)
+        subject     = form.get("subject", None)
+        log_token   = form.get("log-token", False)
+        expires     = form.get("expires", None)
+        if (grant_type == "DID"):
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            '''
+            print("POST parameters:")
+            print(grant)
+            print(challenge)
+            print(proof)
+            print(token_type)
+            print(subject)
+            '''
+            code, output = loop.run_until_complete(
+                Indy.verify_did(grant, challenge, proof, self.wallet_handle, self.pool_handle, True))
+            loop.close()
+        if (grant_type == "auth_code"):
+            code = 200
+        if (code == 200):
+            with open(self.conf['as_private_key'], mode='rb') as file: 
+                as_private_key = file.read()
+            code, output = self.pds.generate_token(as_private_key, target, subject, expires, token_type)
+
+        response = Response(json.dumps(output).encode(), status=code, mimetype='application/json')
+        return response(environ, start_response)
+    
+    def __call__(self, environ, start_response):
+        return self.wsgi_app(environ, start_response)
+
+def create_app():
+    app = PDSHandler()
+    return app
+
+def main(): 
+    from werkzeug.serving import run_simple
+    app = create_app()
+    run_simple('127.0.0.1', 9001, app)
 
 
 if __name__ == '__main__':

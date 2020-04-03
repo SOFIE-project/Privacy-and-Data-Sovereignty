@@ -15,9 +15,9 @@ import time
 def server():
     import subprocess
     import time
-    p1 = subprocess.Popen(['python3', 'PDS/pds.py', 'tests/conf/test.conf'])
-    p2 = subprocess.Popen(['python3', 'PDS/pds_admin.py', 'tests/conf/test.conf'])
-    time.sleep(1) #Otherwise the server is not ready when tests start
+    p1 = subprocess.Popen(['python3', 'PDS/pds.py'])
+    p2 = subprocess.Popen(['python3', 'PDS/pds_admin.py'])
+    time.sleep(5) #Otherwise the server is not ready when tests start
     yield
     p1.kill()
     p2.kill()
@@ -58,12 +58,12 @@ async def test_add_did():
     verkey = await did.key_for_local_did(wallet_handle, user['did'])
     nbf = time.mktime(datetime.datetime(2020, 4, 1, 00, 00).timetuple())
     exp = time.mktime(datetime.datetime(2020, 4, 1, 23, 59).timetuple()) 
-    payload = {'did':user['did'], 'verkey': verkey, 'metadata':json.dumps({'aud': 'sofie-iot.eu','nbf':nbf, 'exp': exp})}
-    response  = requests.post("http://localhost:9002/add", data = payload).text
+    payload = {'action':'add','did':user['did'], 'verkey': verkey, 'metadata':json.dumps({'aud': 'sofie-iot.eu','nbf':nbf, 'exp': exp})}
+    response  = requests.post("http://localhost:9002/", data = payload).text
     response =json.loads(response)
     assert(response['code'] == 200)
-    payload = {'did':user['did']}
-    response  = requests.post("http://localhost:9002/get", data = payload).text
+    payload = {'action':'get', 'did':user['did']}
+    response  = requests.post("http://localhost:9002/", data = payload).text
     response =json.loads(response)
     assert(response['code'] == 200)
     await wallet.close_wallet(wallet_handle)

@@ -28,13 +28,14 @@ Python 3, Hyperledger Indy SDK and the python wrapper, PyJWT are required. Use t
 * sudo apt-get update
 * sudo apt-get install -y libindy
 * pip3 install python3-indy pyjwt web3
+* pip3 install Werkzeug
 
 
 ### Configuration
-A sample configuration file is provided at conf/sample.conf
+A sample configuration file is provided at conf/psd.conf
 
 ### Execution from source
-From the root directory run `python3 PDS/pds.py <configuration file>` e.g., `python3 PDS/pds.py conf/pdf.conf`
+From the root directory run `python3 PDS/pds.py`
 
 ### Dockerized version
 In order to build PDS image, execute the script `docker-build.sh`. Then you can run PDS using, for example,  `docker run -tid --rm -p 9001:9001 pds`. You can verfiry that PDS is running properly be executing in the examples folder: `python3 get_token.py`
