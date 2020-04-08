@@ -15,4 +15,4 @@ RUN pip3 install Werkzeug
 
 COPY PDS/ PDS/
 COPY conf/ conf/
-ENTRYPOINT [ "python3", "PDS/pds.py", "conf/pds.conf" ]
+ENTRYPOINT [ "python3", "PDS/pds.py"]

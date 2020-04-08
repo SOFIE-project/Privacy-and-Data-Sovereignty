@@ -93,7 +93,7 @@ def create_app():
 def main(): 
     from werkzeug.serving import run_simple
     app = create_app()
-    run_simple('127.0.0.1', 9001, app)
+    run_simple('', 9001, app)
 
 
 if __name__ == '__main__':
