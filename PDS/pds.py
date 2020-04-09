@@ -1,6 +1,7 @@
 from werkzeug.wrappers import Request, Response
 from indy import did,wallet,crypto
 from indy_agent import Indy
+from web3 import Web3
 import cgi
 import json
 import random
@@ -10,7 +11,7 @@ import sys
 import jwt
 
 class PDS:
-    def __init__(self, wallet_handle, pool_handle):
+    def __init__(self, wallet_handle=None, pool_handle=None):
         self.wallet_handle = wallet_handle
         self.pool_handle = pool_handle
 
@@ -33,7 +34,11 @@ class PDS:
             )
             loop.close()
             return code, output
-
+    
+    def log_token(self, logged_DID, logged_token, web3_provider, eth_account, PDSContract_instance):
+        tx_hash = PDSContract_instance.functions.new_token(logged_DID, web3_provider.toBytes(text=logged_token)).transact({'from': eth_account})
+        web3_provider.eth.waitForTransactionReceipt(tx_hash)
+        return 200, {'code':200,'message':'token logged'}
 
 class PDSHandler():
     def __init__(self):
@@ -43,6 +48,11 @@ class PDSHandler():
         self.wallet_handle = loop.run_until_complete(wallet.open_wallet(json.dumps(self.conf['wallet_config']), json.dumps(self.conf['wallet_credentials'])))
         self.pool_handle = None
         self.pds = PDS(self.wallet_handle, self.pool_handle)
+        self.web3_provider = Web3(Web3.HTTPProvider(self.conf['web3provider']))
+        self.eth_account = self.web3_provider.eth.accounts[0]
+        with open('conf/contract/PDS.abi', 'r') as myfile:
+            self.abi = myfile.read()
+        self.PDSContract_instance = self.web3_provider.eth.contract(abi=self.abi, address=Web3.toChecksumAddress(self.conf['pds_sc_address']))
 
     def wsgi_app(self, environ, start_response):
         req  = Request(environ)
@@ -57,7 +67,7 @@ class PDSHandler():
         target      = form.get("target", None)
         token_type  = form.get("token-type", None)
         subject     = form.get("subject", None)
-        log_token   = form.get("log-token", False)
+        log_token   = form.get("log-token", None)
         expires     = form.get("expires", None)
         if (grant_type == "DID"):
             loop = asyncio.new_event_loop()
@@ -79,7 +89,8 @@ class PDSHandler():
             with open(self.conf['as_private_key'], mode='rb') as file: 
                 as_private_key = file.read()
             code, output = self.pds.generate_token(as_private_key, target, subject, expires, token_type)
-
+        if (log_token == 'True' and code == 200):
+            self.pds.log_token(subject,output['message'], self.web3_provider,self.eth_account, self.PDSContract_instance)
         response = Response(json.dumps(output).encode(), status=code, mimetype='application/json')
         return response(environ, start_response)
     
