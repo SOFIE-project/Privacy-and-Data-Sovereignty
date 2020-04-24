@@ -1,4 +1,4 @@
-from indy import did,wallet,crypto
+from indy import did,wallet,crypto, anoncreds
 import asyncio
 import base64
 import random
@@ -42,6 +42,31 @@ class Indy:
                 verkey = ""
             #Add code to check if verkey exists
             verification = await crypto.crypto_verify(verkey, challenge.encode(), base64.b64decode(signature))
+            if(verification):
+                return 200, {'code':200,'message':'Success'}
+            else:
+                return 403, {'code':403, 'message':'Signature verification failed'}
+        else:
+            return 403, {'code':403, 'message':'Invalide or missing input parameters'}
+
+    @staticmethod
+    async def verify_vc(challenge = None, proof=None, schemas=None, cred_defs=None):
+        if (challenge == None):
+            nonce = Indy.create_nonce()
+            proof_request = json.dumps({
+                'nonce': nonce,
+                'name': 'proof_req_1',
+                'version': '0.1',
+                'requested_attributes': {
+                    'attr1_referent': {
+                        'name': 'resources',  
+                    }
+                },
+                'requested_predicates': {}
+            })
+            return 401, {'code':401, 'message' : 'Proof required','challenge': base64.b64encode(proof_request.encode()).decode()}
+        if (challenge != None and proof != None and schemas!= None and cred_defs!= None):
+            verification = await anoncreds.verifier_verify_proof(challenge, proof, schemas, cred_defs, "{}", "{}")
             if(verification):
                 return 200, {'code':200,'message':'Success'}
             else:

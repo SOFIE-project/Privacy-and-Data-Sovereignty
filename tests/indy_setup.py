@@ -6,34 +6,34 @@ import asyncio
 import os 
 
 pool_name             = 'Test_pool'
-pool_genesis_txn_path = os.getcwd()+'/scripts/indy_sample_genesis_txn'
+pool_genesis_txn_path = os.getcwd()+'/conf/indy_sample_genesis_txn'
 print(pool_genesis_txn_path)
 '''
 This Steward is part of the indy-sdk testing network
 '''
 steward = {
     'name': "Steward",
-    'wallet_config': json.dumps({'id': 'steward_wallet', "storage_config":{"path":"indy_wallets"}}),
+    'wallet_config': json.dumps({'id': 'steward_wallet', "storage_config":{"path":"tests/indy_wallets"}}),
     'wallet_credentials': json.dumps({'key': 'steward_wallet_key'}),
     'seed': '000000000000000000000000Steward1'
 }
 
 endorser = {
     'name': "Endorser",
-    'wallet_config': json.dumps({'id': 'endorser_wallet', "storage_config":{"path":"indy_wallets"}}),
+    'wallet_config': json.dumps({'id': 'endorser_wallet', "storage_config":{"path":"tests/indy_wallets"}}),
     'wallet_credentials': json.dumps({'key': 'endorser_wallet_key'}),
     'seed': '00000000000000000000000Endorser1' #used only for testing
 }
 
 user = {
-    'wallet_config': json.dumps({'id': 'user_wallet', "storage_config":{"path":"indy_wallets"}}),
+    'wallet_config': json.dumps({'id': 'user_wallet', "storage_config":{"path":"tests/indy_wallets"}}),
     'wallet_credentials': json.dumps({'key': 'user_wallet_key'}),
     'seed': '000000000000000000000000000User1', #used only for testing
     'msk' : 'msk_key'
 }
 
 server = {
-    'wallet_config': json.dumps({'id': 'as_wallet',"storage_config":{"path":"indy_wallets"}}),
+    'wallet_config': json.dumps({'id': 'as_wallet',"storage_config":{"path":"tests/indy_wallets"}}),
     'wallet_credentials': json.dumps({'key': 'server_wallet_key'}),
     'seed': '0000000000000000000000000Server1', #used only for testing
     'msk' : 'msk_key'
@@ -155,19 +155,6 @@ async def setup():
     await wallet.close_wallet(server['wallet'])
     await pool.close_pool_ledger(pool_handle)
     
-    print("Creating client configuration file")
-    conf = {}
-    conf['cred_def_id']    = cred_def_id
-    conf['cred_def']       = cred_def
-    conf['cred_schema_id'] = cred_schema_id
-    conf['cred_schema']    = cred_schema
-    with open('conf/agent.conf', 'w') as f:
-        json.dump(conf,f)
-    conf['pool_name']      = pool_name
-    conf['pool_genesis_txn_path'] = '/indy_sample_genesis_txn'
-    conf['user']          = user
-    with open('conf/client.conf', 'w') as f:
-        json.dump(conf,f)
 
 def main():
     loop = asyncio.get_event_loop()

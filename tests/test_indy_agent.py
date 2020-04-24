@@ -54,61 +54,44 @@ async def server():
     yield
     await pool.close_pool_ledger(pool_handle)
 
+#python3 -m pytest tests/test_indy_agent.py -s --tb=short -k test_valid_vc
 @pytest.mark.asyncio
 async def test_valid_vc():
-    code = 200
     global pool_handle, cred_def_id
-    wallet_handle = await wallet.open_wallet(user['wallet_config'], user['wallet_credentials'])
+    code, response = await Indy.verify_vc()
+    assert (code == 401)
+    challenge           = base64.b64decode(response['challenge']).decode()
+    wallet_handle       = await wallet.open_wallet(user['wallet_config'], user['wallet_credentials'])
     cred_schema_request = await ledger.build_get_schema_request(user['did'], cred_schema_id)
-    pool_response = await ledger.sign_and_submit_request(pool_handle, wallet_handle, user['did'], cred_schema_request)
-    _, cred_schema = await ledger.parse_get_schema_response(pool_response)
-    cred_def_request = await ledger.build_get_cred_def_request(user['did'], cred_def_id)
-    pool_response = await ledger.sign_and_submit_request(pool_handle, wallet_handle, user['did'], cred_def_request)
-    _,cred_def = await ledger.parse_get_cred_def_response(pool_response)
-   
-    proof_request = json.dumps({
-            'nonce': '123432421212',
-            'name': 'proof_req_1',
-            'version': '0.1',
-            'requested_attributes': {
-                'attr1_referent': {
-                    'name': 'resources',  
-                }
-            },
-            'requested_predicates': {}
-        })
-    
-    cred_iter =  await anoncreds.prover_search_credentials_for_proof_req(wallet_handle, proof_request, None)
-    creds     = await anoncreds.prover_fetch_credentials_for_proof_req(cred_iter, 'attr1_referent', 1)
-    cred_info = json.loads(creds)[0]['cred_info']
-    
-    requested_creds = json.dumps({
-            'self_attested_attributes': {},
-            'requested_attributes': {
-                'attr1_referent': {
-                    'cred_id': cred_info['referent'],
-                    'revealed': True
-                }
-            },
-            'requested_predicates': {}
-        })
-    schemas_json = json.dumps({cred_schema_id: json.loads(cred_schema)})
-    cred_defs_json = json.dumps({cred_def_id: json.loads(cred_def)})
-
-    proof_json = await anoncreds.prover_create_proof(wallet_handle,
-                                                         proof_request,
-                                                         requested_creds,
-                                                         'msk_key',
-                                                         schemas_json,
-                                                         cred_defs_json,
-                                                         "{}")
-    print(proof_json)
+    pool_response       = await ledger.sign_and_submit_request(pool_handle, wallet_handle, user['did'], cred_schema_request)
+    _, cred_schema      = await ledger.parse_get_schema_response(pool_response)
+    cred_def_request    = await ledger.build_get_cred_def_request(user['did'], cred_def_id)
+    pool_response       = await ledger.sign_and_submit_request(pool_handle, wallet_handle, user['did'], cred_def_request)
+    _,cred_def          = await ledger.parse_get_cred_def_response(pool_response)    
+    cred_iter           = await anoncreds.prover_search_credentials_for_proof_req(wallet_handle, challenge, None)
+    creds               = await anoncreds.prover_fetch_credentials_for_proof_req(cred_iter, 'attr1_referent', 1)
+    cred_info           = json.loads(creds)[0]['cred_info']
+    schemas             = json.dumps({cred_schema_id: json.loads(cred_schema)})
+    cred_defs           = json.dumps({cred_def_id: json.loads(cred_def)})
+    creds               = json.dumps({
+                           'self_attested_attributes': {},
+                           'requested_attributes': {
+                               'attr1_referent': {
+                                   'cred_id': cred_info['referent'],
+                                   'revealed': True
+                               }
+                           },
+                           'requested_predicates': {}
+                          })
+    proof               = await anoncreds.prover_create_proof(wallet_handle, challenge, creds, user['msk'], schemas, cred_defs, "{}")
+    code, response      = await Indy.verify_vc(challenge, proof, schemas, cred_defs)
     assert (code == 200)
+    
     await wallet.close_wallet(wallet_handle)
     
 
 
-'''
+
 @pytest.mark.asyncio
 async def test_valid_did():
     code, response = await Indy.verify_did(user['did'])
@@ -151,4 +134,3 @@ async def test_encrypt():
     assert (msg.decode() == "Hello World")
     await wallet.close_wallet(wallet_handle)
     await wallet.close_wallet(server_wallet_handle)
-'''
