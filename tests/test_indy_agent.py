@@ -2,7 +2,8 @@ import sys, os
 myPath = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, myPath + '/../PDS/')
 
-from indy import did,wallet,crypto
+from indy import anoncreds, crypto, did, ledger, pool, wallet
+from indy.error import ErrorCode, IndyError
 from indy_agent import Indy
 import pytest
 import asyncio
@@ -10,7 +11,6 @@ import json
 import base64
 import datetime
 import time
-
 
 user = {
     'wallet_config': json.dumps({'id': 'user_wallet',"storage_config":{"path":"tests/indy_wallets"}}),
@@ -27,7 +27,88 @@ server = {
     'msk' : 'msk_key'
 }
 
+cred_schema_id = 'NKGKtcNwssToP5f7uhsEs4:2:gra:1.0'
+cred_def_id    = "NKGKtcNwssToP5f7uhsEs4:3:CL:13:tag_2"
 
+                  
+
+@pytest.yield_fixture(scope='module')
+def event_loop(request):
+    loop = asyncio.get_event_loop_policy().new_event_loop()
+    yield loop
+    loop.close()
+
+@pytest.fixture(autouse=True, scope="module")
+async def server():
+    global pool_handle
+    pool_name             = 'Test_pool'
+    pool_genesis_txn_path = '/../conf/indy/indy_sample_genesis_txn'
+    pool_config = json.dumps({"genesis_txn": str(pool_genesis_txn_path)})
+    await pool.set_protocol_version(2)
+    try:
+        await pool.create_pool_ledger_config(pool_name, pool_config)
+    except IndyError as ex:
+        if ex.error_code == ErrorCode.PoolLedgerConfigAlreadyExistsError:
+            pass
+    pool_handle = await pool.open_pool_ledger(pool_name, pool_config)
+    yield
+    await pool.close_pool_ledger(pool_handle)
+
+@pytest.mark.asyncio
+async def test_valid_vc():
+    code = 200
+    global pool_handle, cred_def_id
+    wallet_handle = await wallet.open_wallet(user['wallet_config'], user['wallet_credentials'])
+    cred_schema_request = await ledger.build_get_schema_request(user['did'], cred_schema_id)
+    pool_response = await ledger.sign_and_submit_request(pool_handle, wallet_handle, user['did'], cred_schema_request)
+    _, cred_schema = await ledger.parse_get_schema_response(pool_response)
+    cred_def_request = await ledger.build_get_cred_def_request(user['did'], cred_def_id)
+    pool_response = await ledger.sign_and_submit_request(pool_handle, wallet_handle, user['did'], cred_def_request)
+    _,cred_def = await ledger.parse_get_cred_def_response(pool_response)
+   
+    proof_request = json.dumps({
+            'nonce': '123432421212',
+            'name': 'proof_req_1',
+            'version': '0.1',
+            'requested_attributes': {
+                'attr1_referent': {
+                    'name': 'resources',  
+                }
+            },
+            'requested_predicates': {}
+        })
+    
+    cred_iter =  await anoncreds.prover_search_credentials_for_proof_req(wallet_handle, proof_request, None)
+    creds     = await anoncreds.prover_fetch_credentials_for_proof_req(cred_iter, 'attr1_referent', 1)
+    cred_info = json.loads(creds)[0]['cred_info']
+    
+    requested_creds = json.dumps({
+            'self_attested_attributes': {},
+            'requested_attributes': {
+                'attr1_referent': {
+                    'cred_id': cred_info['referent'],
+                    'revealed': True
+                }
+            },
+            'requested_predicates': {}
+        })
+    schemas_json = json.dumps({cred_schema_id: json.loads(cred_schema)})
+    cred_defs_json = json.dumps({cred_def_id: json.loads(cred_def)})
+
+    proof_json = await anoncreds.prover_create_proof(wallet_handle,
+                                                         proof_request,
+                                                         requested_creds,
+                                                         'msk_key',
+                                                         schemas_json,
+                                                         cred_defs_json,
+                                                         "{}")
+    print(proof_json)
+    assert (code == 200)
+    await wallet.close_wallet(wallet_handle)
+    
+
+
+'''
 @pytest.mark.asyncio
 async def test_valid_did():
     code, response = await Indy.verify_did(user['did'])
@@ -70,3 +151,4 @@ async def test_encrypt():
     assert (msg.decode() == "Hello World")
     await wallet.close_wallet(wallet_handle)
     await wallet.close_wallet(server_wallet_handle)
+'''

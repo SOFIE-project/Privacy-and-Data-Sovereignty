@@ -2,10 +2,10 @@ from web3 import Web3
 import json
 
 w3 = Web3(Web3.HTTPProvider("HTTP://127.0.0.1:8545"))
-with open('contract/PDS.abi', 'r') as myfile:
+with open('../conf/contract/PDS.abi', 'r') as myfile:
   abi = myfile.read()
 
-with open('contract/PDS.bin', 'r') as myfile:
+with open('../conf/contract/PDS.bin', 'r') as myfile:
   binfile = myfile.read()
   bytecode = json.loads(binfile)['object']
 

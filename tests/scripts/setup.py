@@ -6,7 +6,8 @@ import asyncio
 import os 
 
 pool_name             = 'Test_pool'
-pool_genesis_txn_path = os.getcwd()+'/indy_sample_genesis_txn'
+pool_genesis_txn_path = os.getcwd()+'/scripts/indy_sample_genesis_txn'
+print(pool_genesis_txn_path)
 '''
 This Steward is part of the indy-sdk testing network
 '''
@@ -39,9 +40,9 @@ server = {
 }
 
 credential = {
-    'name': 'Grant',
+    'name': 'gra',
     'version': '1.0',
-    'attributes': ['resources', 'operations']
+    'attributes': '["resources", "operations"]'
 }
 
 cred_values = json.dumps({
@@ -82,7 +83,7 @@ async def setup():
     endorser['did_info']             = json.dumps({'seed': endorser['seed']})       
     endorser['did'], endorser['key'] = await did.create_and_store_my_did(endorser['wallet'], endorser['did_info'])
     nym_request                      = await ledger.build_nym_request(steward['did'], endorser['did'], endorser['key'], None, 'TRUST_ANCHOR')
-    await ledger.sign_and_submit_request(pool_handle, steward['wallet'], steward['did'], nym_request)
+    result = await ledger.sign_and_submit_request(pool_handle, steward['wallet'], steward['did'], nym_request)
     print("...Endorser DID: " + endorser['did'])
     #################################################
     print("5. Creating user wallet, DID, storing it in the ledger, and creating master secret key")
@@ -102,17 +103,22 @@ async def setup():
         if ex.error_code == ErrorCode.AnoncredsMasterSecretDuplicateNameError:
             pass 
     #################################################
-    print("6. Creating credential schema and storing it the ledger")
-    cred_schema_id, cred_schema = await anoncreds.issuer_create_schema(endorser['did'], credential['name'], credential['version'], json.dumps(credential['attributes']))
+    print("6. Creating credential schema and storing it in the ledger")
+    cred_schema_id, cred_schema = await anoncreds.issuer_create_schema(endorser['did'], credential['name'], credential['version'], credential['attributes'])
     print("...cred_schema_id = " + cred_schema_id)
-    print("...cred_schema = " + cred_schema)
     schema_request = await ledger.build_schema_request(endorser['did'], cred_schema)
-    await ledger.sign_and_submit_request(pool_handle, endorser['wallet'], endorser['did'], schema_request)
+    result = await ledger.sign_and_submit_request(pool_handle, endorser['wallet'], endorser['did'], schema_request)
     #################################################
-    print("7. Creating credential")
-    cred_def_id, cred_def = await anoncreds.issuer_create_and_store_credential_def(endorser['wallet'], endorser['did'], cred_schema, 'TAG1', 'CL', json.dumps({"support_revocation": False}))
+    print("7. Creating credential definition and storing it in the ledger")
+    cred_schema_request = await ledger.build_get_schema_request(endorser['did'], cred_schema_id)
+    pool_response = await ledger.sign_and_submit_request(pool_handle, endorser['wallet'], endorser['did'], cred_schema_request)
+    _, cred_schema = await ledger.parse_get_schema_response(pool_response)
+    print("...cred_schema = " + cred_schema)
+    cred_def_id, cred_def = await anoncreds.issuer_create_and_store_credential_def(endorser['wallet'], endorser['did'], cred_schema, 'tag_2', 'CL', json.dumps({"support_revocation": False}))
     print("...cred_def_id = " + cred_def_id)
     print("...cred_def = " + cred_def)
+    cred_def_request = await ledger.build_cred_def_request(endorser['did'], cred_def)
+    result = await ledger.sign_and_submit_request(pool_handle, endorser['wallet'], endorser['did'], cred_def_request)
     #################################################
     print("8. Creating credential offer")
     cred_offer = await anoncreds.issuer_create_credential_offer(endorser['wallet'], cred_def_id)
