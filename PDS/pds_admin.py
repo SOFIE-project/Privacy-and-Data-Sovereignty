@@ -14,11 +14,14 @@ wallet_handle = ""
 pool_handle = ""
 
 class PDSAdminHandler():
-    def __init__(self):
+    def __init__(self, wallet_handle = None):
         with open('conf/pds.conf') as f:
             self.conf = json.load(f)
         loop = asyncio.get_event_loop()
-        self.wallet_handle = loop.run_until_complete(wallet.open_wallet(json.dumps(self.conf['wallet_config']), json.dumps(self.conf['wallet_credentials'])))
+        if (wallet_handle == None):
+            self.wallet_handle = loop.run_until_complete(wallet.open_wallet(json.dumps(self.conf['wallet_config']), json.dumps(self.conf['wallet_credentials'])))
+        else:
+            self.wallet_handle = wallet_handle
         self.pool_handle = None
 
     def wsgi_app(self, environ, start_response):
@@ -55,7 +58,7 @@ def create_app():
 def main(): 
     from werkzeug.serving import run_simple
     app = create_app()
-    run_simple('127.0.0.1', 9002, app)
+    run_simple('', 9002, app)
 
 
 if __name__ == '__main__':

@@ -2,6 +2,7 @@ from werkzeug.wrappers import Request, Response
 from indy import did,wallet,crypto
 from indy_agent import Indy
 from web3 import Web3
+from pds_admin import PDSAdminHandler
 import cgi
 import json
 import random
@@ -47,12 +48,16 @@ class PDSHandler():
         loop = asyncio.get_event_loop()
         self.wallet_handle = loop.run_until_complete(wallet.open_wallet(json.dumps(self.conf['wallet_config']), json.dumps(self.conf['wallet_credentials'])))
         self.pool_handle = None
-        self.pds = PDS(self.wallet_handle, self.pool_handle)
-        self.web3_provider = Web3(Web3.HTTPProvider(self.conf['web3provider']))
-        self.eth_account = self.web3_provider.eth.accounts[0]
-        with open('conf/contract/PDS.abi', 'r') as myfile:
-            self.abi = myfile.read()
-        self.PDSContract_instance = self.web3_provider.eth.contract(abi=self.abi, address=Web3.toChecksumAddress(self.conf['pds_sc_address']))
+        try:
+            self.pds = PDS(self.wallet_handle, self.pool_handle)
+            self.web3_provider = Web3(Web3.HTTPProvider(self.conf['web3provider']))
+            self.eth_account = self.web3_provider.eth.accounts[0]
+            with open('conf/contract/PDS.abi', 'r') as myfile:
+                self.abi = myfile.read()
+            self.PDSContract_instance = self.web3_provider.eth.contract(abi=self.abi, address=Web3.toChecksumAddress(self.conf['pds_sc_address']))
+        except:
+            print("Couldn't connect to Ethereum blockchain")
+            pass
 
     def wsgi_app(self, environ, start_response):
         req  = Request(environ)
@@ -83,6 +88,12 @@ class PDSHandler():
             code, output = loop.run_until_complete(
                 Indy.verify_did(grant, challenge, proof, self.wallet_handle, self.pool_handle, True))
             loop.close()
+            if code == 200:
+                loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(loop)
+                _, output = loop.run_until_complete(
+                    Indy.get_did_metadata(self.wallet_handle, grant))
+                target = json.loads(output['message'])['aud']
         if (grant_type == "auth_code"):
             code = 200
         if (code == 200):
@@ -99,6 +110,10 @@ class PDSHandler():
 
 def create_app():
     app = PDSHandler()
+    return app
+
+def create_admin_app(wallet_handle = None):
+    app = PDSAdminHandler(wallet_handle)
     return app
 
 def main(): 

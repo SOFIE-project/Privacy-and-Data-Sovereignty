@@ -1,1 +1,1 @@
- docker build -t pds -f PDS.dockerfile --build-arg LISTENING_PORT="9001" .
+ docker build -t pds -f PDS.dockerfile --build-arg LISTENING_PORT="9001-9002" .

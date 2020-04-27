@@ -39,7 +39,7 @@ A sample configuration file is provided at conf/psd.conf
 From the root directory run `python3 PDS/pds.py`
 
 ### Dockerized version
-In order to build PDS image, execute the script `docker-build.sh`. Then you can run PDS using, for example,  `docker run -tid --rm -p 9001:9001 pds`. You can verfiy that PDS is running properly be executing in the examples folder: `python3 get_token.py`
+In order to build PDS image, execute the script `docker-build.sh`. Then you can run PDS using, for example,  `docker run -tid --rm -p 9001-9002:9001-9002 pds`. You can verify that PDS is running properly be executing in the examples folder: `python3 get_token.py`
 
 ### Usage
 The executed script creates an HTTP server that listens for REST API calls at port 9001. The REST API of PDS component is documented in 
@@ -52,7 +52,7 @@ Please select **schema** to see all available API parameters and their documenta
 ## Testing
 
 ### Prerequisites
-For testing purposes ganache-cli and Indy testing pool are required. To install ganache exectute:
+For testing purposes ganache-cli and Indy testing pool are required. To install ganache execute:
 
 * npm install -g ganache-cli
 
