@@ -9,6 +9,6 @@
     "author": "SOFIE Project",
     "license": "APL 2.0",
     "dependencies": {
-      "@openzeppelin/contracts": "^3.0.1"
+      "@openzeppelin/contracts": "^2.5.0"
     }
 }
