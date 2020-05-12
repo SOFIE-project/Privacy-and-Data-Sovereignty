@@ -1,5 +1,5 @@
 {
-    "name": "sofie-privacy-data-sovereignty",
+    "name": "sofie-pds",
     "version": "1.0.0",
     "description": "Smart contract to store access tokens logged on the blockchain.",
     "files": [
@@ -7,5 +7,8 @@
     ],
     "repository": "https://github.com/SOFIE-project/Privacy-and-Data-Sovereignty",
     "author": "SOFIE Project",
-    "license": "APL 2.0"
+    "license": "APL 2.0",
+    "dependencies": {
+      "@openzeppelin/contracts": "^3.0.1"
+    }
 }
