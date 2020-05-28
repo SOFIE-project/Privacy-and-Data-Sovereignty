@@ -35,9 +35,9 @@ async def server():
     }
     wallet_handle = await wallet.open_wallet(user['wallet_config'], user['wallet_credentials'])
     verkey = await did.key_for_local_did(wallet_handle, user['did'])
-    nbf = time.mktime(datetime.datetime(2020, 4, 1, 00, 00).timetuple())
-    exp = time.mktime(datetime.datetime(2020, 4, 1, 23, 59).timetuple()) 
-    payload = {'action':'add','did':user['did'], 'verkey': verkey, 'metadata':json.dumps({'aud': 'sofie-iot.eu','nbf':nbf, 'exp': exp})}
+    nbf = time.mktime(datetime.datetime(2020, 6, 1, 00, 00).timetuple())
+    exp = time.mktime(datetime.datetime(2020, 6, 1, 23, 59).timetuple()) 
+    payload = {'action':'add','did':user['did'], 'verkey': verkey, 'metadata':json.dumps({'aud': 'locker1.sofie-iot.eu','nbf':nbf, 'exp': exp})}
     response  = requests.post("http://localhost:9002/", data = payload).text
     response =json.loads(response)
     assert(response['code'] == 200)
