@@ -16,7 +16,7 @@ class PDS:
         self.wallet_handle = wallet_handle
         self.pool_handle = pool_handle
 
-    def generate_token(self, private_key, audience=None,  subject=None, expires=None, token_type=None ):
+    def generate_token(self, private_key, audience=None,  subject=None, expires=None, nbf = None, token_type=None ):
         claims = {}
         if audience:
             claims['aud'] = audience
@@ -24,6 +24,8 @@ class PDS:
             claims['sub'] = subject
         if expires:
             claims['exp'] = expires
+        if nbf:
+            claims['nbf'] = nbf
         token = jwt.encode(claims,private_key, algorithm='RS256')
         if token_type == None:
             return 200, {'code':200,'message':token.decode('utf-8')}
@@ -74,6 +76,7 @@ class PDSHandler():
         subject     = form.get("subject", None)
         log_token   = form.get("log-token", None)
         expires     = form.get("expires", None)
+        nbf         = form.get("nbf", None)
         if (grant_type == "DID"):
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
@@ -93,13 +96,15 @@ class PDSHandler():
                 asyncio.set_event_loop(loop)
                 _, output = loop.run_until_complete(
                     Indy.get_did_metadata(self.wallet_handle, grant))
-                target = json.loads(output['message'])['aud']
+                target  = json.loads(output['message'])['aud']
+                expires = json.loads(output['message'])['exp']
+                nbf     = json.loads(output['message'])['nbf']
         if (grant_type == "auth_code"):
             code = 200
         if (code == 200):
             with open(self.conf['as_private_key'], mode='rb') as file: 
                 as_private_key = file.read()
-            code, output = self.pds.generate_token(as_private_key, target, subject, expires, token_type)
+            code, output = self.pds.generate_token(as_private_key, target, subject, expires, nbf, token_type)
         if (log_token == 'True' and code == 200):
             self.pds.log_token(subject,output['message'], self.web3_provider,self.eth_account, self.PDSContract_instance)
         response = Response(json.dumps(output).encode(), status=code, mimetype='application/json')
