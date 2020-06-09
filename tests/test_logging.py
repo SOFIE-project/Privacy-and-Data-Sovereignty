@@ -18,13 +18,12 @@ def deploy_ganache():
     p1 = subprocess.Popen(['ganache-cli', '-m', 'myth like bonus scare over problem client lizard pioneer submit female collect']) #use this mnemonic to much the contract address in configuration
     time.sleep(10) #Otherwise the server is not ready when tests start
     w3 = Web3(Web3.HTTPProvider("HTTP://127.0.0.1:8545"))
-    with open('conf/contract/PDS.abi', 'r') as myfile:
+    with open('conf/contract/build/PDS.abi', 'r') as myfile:
         abi = myfile.read()
-    with open('conf/contract/PDS.bin', 'r') as myfile:
+    with open('conf/contract/build/PDS.bin', 'r') as myfile:
         binfile = myfile.read()
-    bytecode = json.loads(binfile)['object']
     account = w3.eth.accounts[0]
-    PDSContract = w3.eth.contract(abi=abi, bytecode=bytecode)
+    PDSContract = w3.eth.contract(abi=abi, bytecode=binfile)
     tx_hash = PDSContract.constructor().transact({'from': account})
     tx_receipt = w3.eth.waitForTransactionReceipt(tx_hash)
     address = tx_receipt.contractAddress
