@@ -42,11 +42,57 @@ From the root directory run `python3 PDS/pds.py`
 In order to build PDS image, execute the script `docker-build.sh`. Then you can run PDS using, for example,  `docker run -tid --rm -p 9001-9002:9001-9002 pds`. You can verify that PDS is running properly be executing in the examples folder: `python3 get_token.py`
 
 ### Usage
-The executed script creates an HTTP server that listens for REST API calls at port 9001. The REST API of PDS component is documented in 
+The executed script creates an Authorization Server (AS) that listens for REST API calls at port 9001. A client requests
+a token, and the AS responds with an authentication challenge, the client responds to challenge, and the AS sends the token.
+All API calls are made using the HTTP POST method and all parameters are included in the POST request payload. 
 
-https://app.swaggerhub.com/apis-docs/nikosft/SOFIE-PDS-IAA/1.0.0#/PDS/gettoken 
+Currently clients can be authenticated using either a DID, or an `authentication grant'. In the former case
+the PDS should be configured with token metadata per authorized DID (using the administrative interface).
+The latter case is based in a pre-configured, shared secret. Clients authenticated using the grant have a 
+privileged role and can define themselves the token metadata. 
 
-Please select **schema** to see all available API parameters and their documentation.
+#### Token request API call (unauthenticated users)
+| Parameter | Possible values |
+| --- | --- |
+| grant-type | "DID" |
+
+Response
+```JSON
+{'code':401, 'message' : 'Proof required','challenge': A challenge}
+```
+
+Example
+```Python
+payload = {'grant-type':'DID'}
+response  = requests.post("http://localhost:9001/gettoken", data = payload).text
+response =json.loads(response)
+challenge = response['challenge']
+```
+#### Token request API call (authenticated users)
+| Parameter | Possible values |
+| --- | --- |
+| grant-type | "DID", "auth_code" |
+| grant | The DID, or the authentication code of the client |
+| challenge (only with grant_type = "DID")| The challenge generated in the previous API call |
+| proof (only with grant_type = "DID") | The response to the challenge |
+| log_token (optional, records the token in an Ethereum smart contract) | "True", "False" |
+| enc_key (optional)| A hex encoded Ed25519 public key to encrypt the token |
+| metadata (optional, only with grant_type = "auth_code")| JSON encoded token metadata | 
+
+
+Response
+```JSON
+{'code':200, 'message' : The generated token}
+```
+
+Example
+```Python
+payload = {'grant-type':'auth_code', 'grant':grant, 'log_token':'True', 'enc_key':key, 'metadata':json.dumps({'aud': 'sofie-iot.eu','nbf':nbf, 'exp': exp}}
+response  = requests.post("http://localhost:9001/gettoken", data = payload).text
+response =json.loads(response)
+token = response['message']
+```
+
 
 
 ## Testing

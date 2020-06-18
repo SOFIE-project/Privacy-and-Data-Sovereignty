@@ -77,6 +77,7 @@ class PDSHandler():
         log_token   = form.get("log-token", None)
         expires     = form.get("expires", None)
         nbf         = form.get("nbf", None)
+        
         if (grant_type == "DID"):
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
