@@ -57,7 +57,7 @@ privileged role and can define themselves the token metadata.
 | grant-type | "DID" |
 
 Response
-```JSON
+```
 {'code':401, 'message' : 'Proof required','challenge': A challenge}
 ```
 
@@ -81,7 +81,7 @@ challenge = response['challenge']
 
 
 Response
-```JSON
+```
 {'code':200, 'message' : The generated token}
 ```
 
