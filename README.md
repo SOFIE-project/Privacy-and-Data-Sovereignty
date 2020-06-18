@@ -87,6 +87,10 @@ Response
 
 Example
 ```Python
+nbf   = time.mktime(datetime.datetime(2020, 4, 1, 00, 00).timetuple())
+exp   = time.mktime(datetime.datetime(2020, 4, 1, 23, 59).timetuple())
+grant = "shared secret"
+key   = "E390CF3B5B93E921C45ED978737D89F61B8CAFF9DE76BFA5F63DA20386BCCA3B"
 payload = {'grant-type':'auth_code', 'grant':grant, 'log_token':'True', 'enc_key':key, 'metadata':json.dumps({'aud': 'sofie-iot.eu','nbf':nbf, 'exp': exp}}
 response  = requests.post("http://localhost:9001/gettoken", data = payload).text
 response =json.loads(response)
