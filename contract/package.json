@@ -1,6 +1,6 @@
 {
   "name": "sofie-pds",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Smart contract to store access tokens logged on the blockchain.",
   "files": [
     "*.sol"

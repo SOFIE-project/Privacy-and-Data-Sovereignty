@@ -171,7 +171,7 @@ async def test_valid_auth_code_ecn_token_with_logging():
     publicKeyHex =  '34a0d7e2c95b24c9c87e47ce4e528c3814a8516528b4095c84b49908390b7a24'
     nbf = time.mktime(datetime.datetime(2020, 4, 1, 00, 00).timetuple())
     exp = time.mktime(datetime.datetime(2020, 4, 1, 23, 59).timetuple()) 
-    payload = {'grant-type':'auth_code', 'grant':'shared_secret_key', 'metadata':json.dumps({'aud': 'sofie-iot.eu','nbf':nbf, 'exp': exp}), 'enc-key':publicKeyHex, 'log-token': publicKeyHex}
+    payload = {'grant-type':'auth_code', 'grant':'shared_secret_key', 'metadata':json.dumps({'aud': 'sofie-iot.eu','nbf':nbf, 'exp': exp}), 'enc-key':publicKeyHex, 'log-token': '0x68656c6c6f20776f726c64'}
     response  = requests.post("http://localhost:9001/gettoken", data = payload).text
     response =json.loads(response)
     enc64 = response['message']
