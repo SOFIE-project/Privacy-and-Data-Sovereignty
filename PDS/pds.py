@@ -39,7 +39,8 @@ class PDS:
 
     
     def log_token(self, metadata, logged_token, web3_provider, eth_account, PDSContract_instance):
-        tx_hash = PDSContract_instance.functions.new_token(web3_provider.toBytes(text=metadata), web3_provider.toBytes(text=logged_token)).transact({'from': eth_account})
+        #tx_hash = PDSContract_instance.functions.new_token(web3_provider.toBytes(text=metadata), web3_provider.toBytes(text=logged_token)).transact({'from': eth_account})
+        tx_hash = PDSContract_instance.functions.new_token(metadata, web3_provider.toBytes(text=logged_token)).transact({'from': eth_account})
         web3_provider.eth.waitForTransactionReceipt(tx_hash)
         return 200, {'code':200,'message':'token logged'}
 

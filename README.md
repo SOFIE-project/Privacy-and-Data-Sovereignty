@@ -76,7 +76,7 @@ challenge = response['challenge']
 | grant | The DID, or the authentication code of the client |
 | challenge (only with grant_type = "DID")| The challenge generated in the previous API call |
 | proof (only with grant_type = "DID") | The response to the challenge |
-| log-token (optional, records the token in an Ethereum smart contract) | The metadata to be recorded, along with the token |
+| log-token (optional, records the token in an Ethereum smart contract) | The hex encoded metadata to be recorded, along with the token |
 | enc-key (optional)| A hex encoded Ed25519 public key to encrypt the token |
 | metadata (optional, only with grant_type = "auth_code")| JSON encoded token metadata | 
 
@@ -92,7 +92,7 @@ nbf   = time.mktime(datetime.datetime(2020, 4, 1, 00, 00).timetuple())
 exp   = time.mktime(datetime.datetime(2020, 4, 1, 23, 59).timetuple())
 grant = "shared secret"
 key   = "E390CF3B5B93E921C45ED978737D89F61B8CAFF9DE76BFA5F63DA20386BCCA3B"
-payload = {'grant-type':'auth_code', 'grant':grant, 'log-token':'Token for user A', 'enc-key':key, 'metadata':json.dumps({'aud': 'sofie-iot.eu','nbf':nbf, 'exp': exp}}
+payload = {'grant-type':'auth_code', 'grant':grant, 'log-token':'0xa5b9d60f32436310afebcfda832817a68921beb782fabf7915cc0460b443116a', 'enc-key':key, 'metadata':json.dumps({'aud': 'sofie-iot.eu','nbf':nbf, 'exp': exp}}
 response  = requests.post("http://localhost:9001/gettoken", data = payload).text
 response =json.loads(response)
 token = response['message']
