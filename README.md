@@ -1,5 +1,7 @@
 # Privacy and Data Sovereignty Component
 ## Description
+This is the Privacy and Data Sovereignty Component of the SOFIE framework. It acts as an OAuth2.0 authorization server. It accepts as
+authorization grants: Decentralized Identifiers, Verifiable Credentials, and pre-shared secret keys. It outputs JSON web tokens. 
 
 
 ### Architecture Overview
