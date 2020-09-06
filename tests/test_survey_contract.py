@@ -37,7 +37,7 @@ class TestSurveyContract:
         global w3, surveyContract_instance, account
 
         survey_name = "test"
-        number_of_questions = 2
+        number_of_questions = 4
         tx_hash = surveyContract_instance.functions.createSurvey(survey_name, number_of_questions).transact({'from': account})
 
         number_of_questions1 = surveyContract_instance.functions.getNumberOfQuestions(survey_name).call()
@@ -48,7 +48,7 @@ class TestSurveyContract:
         global w3, surveyContract_instance, account
 
         survey_name = "test"
-        responses = [1,0]
+        responses = [1,0,1,0]
         tx_hash = surveyContract_instance.functions.recordResponses(survey_name, responses).transact({'from': account})
 
         counter = surveyContract_instance.functions.getCounter(survey_name).call()
@@ -62,7 +62,7 @@ class TestSurveyContract:
         global w3, surveyContract_instance, account
 
         survey_name = "test"
-        responses = [1,0]
+        responses = [1,0,1,0]
         tx_hash = surveyContract_instance.functions.recordResponses(survey_name, responses).transact({'from': account})
 
         tx_hash1 = surveyContract_instance.functions.resetSurvey(survey_name).transact({'from': account})
