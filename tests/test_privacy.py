@@ -1,6 +1,12 @@
 import pytest
 from web3 import Web3
 
+import sys, os
+myPath = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, myPath + '/../Privacy/')
+from responder import Responder
+from reviewer import Reviewer
+
 
 @pytest.fixture(autouse=True, scope="class")
 def Ganache():
@@ -23,52 +29,34 @@ def Ganache():
     tx_hash = surveyContract.constructor().transact({'from': account})
     tx_receipt = w3.eth.waitForTransactionReceipt(tx_hash)
     address = tx_receipt.contractAddress
-    
+    print("Address:", address)
     surveyContract_instance = w3.eth.contract(abi = abi, address = address)
     survey_name = "test"
-    number_of_questions = 2
+    number_of_questions = 10
     tx_hash = surveyContract_instance.functions.createSurvey(survey_name, number_of_questions).transact({'from': account})
 
     yield
     p1.kill()
 
 class TestSurveyContract:
-    def test_survey_creation(self):
-        global w3, surveyContract_instance, account
-
-        survey_name = "test"
-        number_of_questions = 4
-        tx_hash = surveyContract_instance.functions.createSurvey(survey_name, number_of_questions).transact({'from': account})
-
-        number_of_questions1 = surveyContract_instance.functions.getNumberOfQuestions(survey_name).call()
-        
-        assert(number_of_questions == number_of_questions1)
 
     def test_responses(self):
         global w3, surveyContract_instance, account
-
         survey_name = "test"
-        responses = [1,0,1,0]
-        tx_hash = surveyContract_instance.functions.recordResponses(survey_name, responses).transact({'from': account})
-
+        responder = Responder()
+        responder.record_response(10, 5, survey_name)
+        responder.record_response(10, 4, survey_name)
+        responder.record_response(10, 4, survey_name)
+        responder.record_response(10, 6, survey_name)
         counter = surveyContract_instance.functions.getCounter(survey_name).call()
-        responses_question1 = surveyContract_instance.functions.getResponses(survey_name, 0).call()
-        responses_question2 = surveyContract_instance.functions.getResponses(survey_name, 1).call()
-
-
-        assert(counter == 1 and responses_question1 == 1 and responses_question2 == 0)
+        reviewer = Reviewer()
+        estimated_responses = reviewer.estimate_responses(10, survey_name)
+        print(estimated_responses)
+        assert(counter == 4 )
 
     def test_reset_survey(self):
         global w3, surveyContract_instance, account
-
         survey_name = "test"
-        responses = [1,0,1,0]
-        tx_hash = surveyContract_instance.functions.recordResponses(survey_name, responses).transact({'from': account})
-
         tx_hash1 = surveyContract_instance.functions.resetSurvey(survey_name).transact({'from': account})
-
         counter = surveyContract_instance.functions.getCounter(survey_name).call()
-        responses_question1 = surveyContract_instance.functions.getResponses(survey_name, 0).call()
-        responses_question2 = surveyContract_instance.functions.getResponses(survey_name, 1).call()
-
-        assert(counter == 0 and responses_question1 == 0 and responses_question2 == 0)
+        assert(counter == 0)

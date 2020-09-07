@@ -47,6 +47,10 @@ contract survey {
         }
         
     }
+
+    function getResponses(string memory name) public returns (uint[] memory) {
+        return surveyToResponses[name];
+    } 
     
     // tests //
     function getNumberOfQuestions (string memory name) public returns (uint) {
@@ -57,7 +61,7 @@ contract survey {
         return surveyToCounter[name];
     }
     
-    function getResponses(string memory name, uint question) public returns (uint) {
+    function getResponsesQ(string memory name, uint question) public returns (uint) {
         return surveyToResponses[name][question];
     }
     // tests //
