@@ -3,6 +3,7 @@ from indy import did,wallet,crypto
 from indy_agent import Indy
 from web3 import Web3
 from pds_admin import PDSAdminHandler
+from erc721_pdp import ERC721_pdp
 import cgi
 import json
 import random
@@ -51,6 +52,7 @@ class PDSHandler():
         loop = asyncio.get_event_loop()
         self.wallet_handle = loop.run_until_complete(wallet.open_wallet(json.dumps(self.conf['wallet_config']), json.dumps(self.conf['wallet_credentials'])))
         self.pool_handle = None
+        self.erc721_pdp = ERC721_pdp()
         try:
             self.pds = PDS(self.wallet_handle, self.pool_handle)
             self.web3_provider = Web3(Web3.HTTPProvider(self.conf['web3provider']))
@@ -74,7 +76,8 @@ class PDSHandler():
         proof       = form.get("proof", None)
         token_type  = form.get("token-type", None)
         log_token   = form.get("log-token", None)
-        enc_key   = form.get("enc-key", None)
+        enc_key     = form.get("enc-key", None)
+        erc_721     = form.get("erc-721", None)
 
         if (grant_type == "DID"):
             loop = asyncio.new_event_loop()
@@ -106,6 +109,9 @@ class PDSHandler():
         if (log_token and code == 200):
             self.pds.log_token(log_token, output['message'], self.web3_provider,self.eth_account, self.PDSContract_instance)
             print("token logged")
+        if (erc_721 and code == 200):
+            #erc721_pdp.record_erc721(....)
+            print("Creating ERC-721 token")
         response = Response(json.dumps(output).encode(), status=code, mimetype='application/json')
         return response(environ, start_response)
     
