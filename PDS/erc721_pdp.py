@@ -15,5 +15,6 @@ class ERC721_pdp:
             print("Couldn't connect to Ethereum blockchain:" + self.conf['web3provider'])
             pass
 
-    def record_erc721(self):
-        print("recoreding")
+    def record_erc721(self, account, token_id, token):
+        tx_hash = self.ERC721Contract_instance.functions.mint(account, token_id, token).transact({'from': account})
+        print("recording")

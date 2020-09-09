@@ -22,6 +22,7 @@ class PDS:
     def generate_token(self, private_key, metadata = None, enc_key=None, token_type=None ):
         claims = {}
         metadata = json.loads(metadata)
+        #create token_id
         if 'aud' in metadata:
             claims['aud'] = metadata['aud']
         if 'sub' in metadata:
@@ -36,6 +37,7 @@ class PDS:
             sealed_box = SealedBox(public_key)
             token = sealed_box.encrypt(token)
             token = base64.urlsafe_b64encode(token)
+        #also return the token_id
         return 200, {'code':200,'message':token.decode('utf-8')}
 
     
@@ -70,14 +72,14 @@ class PDSHandler():
         code = 403
         output = {'code':403, 'message':'Invalide or missing input parameters'}
 
-        grant_type  = form.get("grant-type", None)
-        grant       = form.get("grant", None)
-        challenge   = form.get("challenge", None)
-        proof       = form.get("proof", None)
-        token_type  = form.get("token-type", None)
-        log_token   = form.get("log-token", None)
-        enc_key     = form.get("enc-key", None)
-        erc_721     = form.get("erc-721", None)
+        grant_type        = form.get("grant-type", None)
+        grant             = form.get("grant", None)
+        challenge         = form.get("challenge", None)
+        proof             = form.get("proof", None)
+        token_type        = form.get("token-type", None)
+        log_token         = form.get("log-token", None)
+        enc_key           = form.get("enc-key", None)
+        record_erc721     = form.get("erc-721", None)
 
         if (grant_type == "DID"):
             loop = asyncio.new_event_loop()
@@ -109,8 +111,9 @@ class PDSHandler():
         if (log_token and code == 200):
             self.pds.log_token(log_token, output['message'], self.web3_provider,self.eth_account, self.PDSContract_instance)
             print("token logged")
-        if (erc_721 and code == 200):
-            #erc721_pdp.record_erc721(....)
+        if (record_erc721 and code == 200):
+            token_id = int('c0097d06511a91ffd05912862dca06f5bd428886dd3b9534d863947a1aa3e5c4', base=16)
+            self.erc721_pdp.record_erc721(self.eth_account, token_id, output['message'])
             print("Creating ERC-721 token")
         response = Response(json.dumps(output).encode(), status=code, mimetype='application/json')
         return response(environ, start_response)
