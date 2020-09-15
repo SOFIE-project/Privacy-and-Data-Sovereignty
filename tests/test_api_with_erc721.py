@@ -46,10 +46,8 @@ def test_valid_auth_code_erc721():
     response  = requests.post("http://localhost:9001/gettoken", data = payload).text
     response =json.loads(response)
     token = response['message']
-    claima = jwt.decode(token, verify=False)
+    claims = jwt.decode(token, verify=False)
     token_id = claims['jti']
     erc721_token = ERC721Contract_instance.functions.getTokenURI(token_id).call()
-    print(token)
-    print(erc721_token)
     assert(response['code'] == 200 and erc721_token == token) 
 
