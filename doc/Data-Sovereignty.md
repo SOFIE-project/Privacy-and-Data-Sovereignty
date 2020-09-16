@@ -1,34 +1,61 @@
 # Data Sovereignty Module
+- [Description](#Description)
+    - [Architechture Overview](#Architecture-Overview)
+    - [Relation with SOFIE](#Relation-with-SOFIE)
+    - [Key Technologies](#Key-Technologies)
+- [Usage](#Usage)
+    - [Prerequisites](#Prerequisites)
+    - [Installation](#Installation)
+    - [Configuration](#Configuration)
+    - [Execution](#Execution)
+    - [Docker Images](#Docker-Images)
+- [Testing](#Testing)
+    - [Prerequisites for Testing](#Prerequisites-for-Testing)
+    - [Running the Tests](#Running-the-Tests)
+    - [Evaluating Results](#Evaluating-the-Results)
+- [Open Issues](#Open-Issues)
+- [Release Notes](#Release-Notes)
+- [Contact Info](#Contact-Info)
+- [License](#License)
+
 ## Description
 This is the documentation for the Data Sovereignty module of SOFIE's PDS component. It implements an OAuth2.0 authorization server. It accepts as
 authorization grants: Decentralized Identifiers, Verifiable Credentials, and pre-shared secret keys. It outputs JSON web tokens. 
 
+### Architecture
 
-## Installation
+TBD
+
+### Relation with SOFIE
+The Data Sovereignty module is part of SOFIE's [PDS](https://github.com/SOFIE-project/Privacy-and-Data-Sovereignty) component.
+PDS is used by SOFIE's [Energy data exchange](https://media.voog.com/0000/0042/0957/files/sofie-onepager-energy-exchange_final.pdf) and [Food supply chain](https://media.voog.com/0000/0042/0957/files/sofie-onepager-food_final.pdf) pilots in order to implement access control over the shared energy data. 
+
+More information about this component and its relation to the SOFIE project can be found in [D2.5 Federation Framework, SOFIE deliverable](https://media.voog.com/0000/0042/0957/files/SOFIE_D2.5-Federation_Framework%2C_2nd_version.pdf)
+
+## Usage
 
 ### Prerequisites
 Python 3, Hyperledger Indy SDK and the python wrapper, PyJWT are required. Use the following commands to install the prerequisites in Ubuntu 18.04 
 
-* sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys CE7709D068DB5E88
-* sudo add-apt-repository "deb https://repo.sovrin.org/sdk/deb bionic stable"
-* sudo apt-get update
-* sudo apt-get install -y libindy
-* pip3 install python3-indy pyjwt web3
-* pip3 install Werkzeug
-* pip3 install pynacl
+```bash
+sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys CE7709D068DB5E88
+sudo add-apt-repository "deb https://repo.sovrin.org/sdk/deb bionic stable"
+sudo apt-get update
+sudo apt-get install -y libindy
+pip3 install python3-indy pyjwt web3
+pip3 install Werkzeug
+pip3 install pynacl
+```
 
+### Installation
 
 ### Configuration
 A sample configuration file is provided at conf/psd.conf
 
 
-### Execution from source
+### Execution
 From the root directory run `python3 PDS/pds.py`
 
-### Dockerized version
-In order to build PDS image, execute the script `docker-build.sh`. Then you can run PDS using, for example,  `docker run -tid --rm -p 9001-9002:9001-9002 pds`. You can verify that PDS is running properly be executing in the examples folder: `python3 get_token.py`
-
-## Usage
 The executed script creates an Authorization Server (AS) that listens for REST API calls at port 9001. A client requests
 a token, and the AS responds with an authentication challenge, the client responds to challenge, and the AS sends the token.
 All API calls are made using the HTTP POST method and all parameters are included in the POST request payload. 
@@ -85,33 +112,50 @@ response =json.loads(response)
 token = response['message']
 ```
 
+### Docker Images
+In order to build PDS image, execute the script `docker-build.sh`. Then you can run PDS using, for example,  `docker run -tid --rm -p 9001-9002:9001-9002 pds`. You can verify that PDS is running properly be executing in the examples folder: `python3 get_token.py`
+
 
 
 ## Testing
 
-### Prerequisites
+### Prerequisites for Testing
 For testing purposes ganache-cli and Indy testing pool are required. To install ganache execute:
 
-* npm install -g ganache-cli
+```bash
+npm install -g ganache-cli
+```
 
 To install Indy testing pool, execute from the component's root folder:
 
-* docker build -f tests/conf/indy-pool.dockerfile -t indy_pool . 
+```bash
+docker build -f tests/conf/indy-pool.dockerfile -t indy_pool . 
+```
 
 Tests are executed using pytest and pytest-asyncio. To install it execute 
 
-* pip3 install -U pytest 
-* pip3 install pytest-asyncio
+```bash
+pip3 install -U pytest 
+pip3 install pytest-asyncio
+```
 
 ### Running the tests
 First you need to run Hyperledger Indy testing pool:
 
-* docker run --name test_pool -itd --rm -p 9701-9708:9701-9708 indy_pool
+```bash
+docker run --name test_pool -itd --rm -p 9701-9708:9701-9708 indy_pool
+```
 
 Then you need to setup Indy testing accounts, and finally run the test. From the root directory run:
 
-* python3 tests/indy_setup.py 
-* python3 -m pytest -s  tests/
+```bash
+python3 tests/indy_setup.py 
+python3 -m pytest -s  tests/
+```
+
+### Evaluating the Results
+
+Test results are shown in the standard output. 
 
 
 ## Known/Open Issues
@@ -121,5 +165,9 @@ No known issues
 ## Contact info
 
 Please contact Nikos Fotiou or Iakovos Pittaras (AUEB) in case of any questions.
+
+## License
+
+This component is licensed under the Apache License 2.0.
 
 ***
