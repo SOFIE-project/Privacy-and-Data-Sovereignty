@@ -13,10 +13,8 @@
 - [Testing](#Testing)
     - [Prerequisites for Testing](#Prerequisites-for-Testing)
     - [Running the Tests](#Running-the-Tests)
-    - [Evaluating Results](Evaluating-Results)
-- [Generating Documentation](#Generating-Documentation)
+    - [Evaluating Results](#Evaluating-the-Results)
 - [Open Issues](#Open-Issues)
-- [Future Work](#Future-Work)
 - [Release Notes](#Release-Notes)
 - [Contact Info](#Contact-Info)
 - [License](#License)
@@ -33,7 +31,7 @@ number of responses.
 User results are stored in a smart contract, included in the module. Therefore, since all answers are public
 anybody can extract the aggregated statistics. 
 
-### Architecture
+### Architecture Overview
 
 The architecture of the privacy module is illustrated in Figure 1. It is composed of a Service Provider, that creates
 surveys, a Data Provider, that provides responses to the survey, and a Statistics Consumer that extracts statistics
@@ -130,13 +128,14 @@ pip3 install pytest-asyncio
 
 ### Running the Tests
 
-Execute the following commnad
+Execute the following command
 
 ```bash
 python3 -m pytest -s tests/test_privacy.py 
 ```
 
 ### Evaluating the Results
+
 Test results are shown in the standard output. 
 
 ## Known/Open Issues
