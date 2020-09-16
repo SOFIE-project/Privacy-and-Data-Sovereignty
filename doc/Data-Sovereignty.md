@@ -63,6 +63,7 @@ challenge = response['challenge']
 | challenge (only with grant_type = "DID")| The challenge generated in the previous API call |
 | proof (only with grant_type = "DID") | The response to the challenge |
 | log-token (optional, records the token in an Ethereum smart contract) | The hex encoded metadata to be recorded, along with the token |
+| erc-721 (optional, creates an erc-721 token) | True |
 | enc-key (optional)| A hex encoded Ed25519 public key to encrypt the token |
 | metadata (optional, only with grant_type = "auth_code")| JSON encoded token metadata | 
 

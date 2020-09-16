@@ -4,14 +4,16 @@ This is the Privacy and Data Sovereignty (PDS) Component of the SOFIE framework.
 PDS is composed of two modules: the Privacy module and the Data Sovereignty module.
 Each module can be used independently from the other.
 
+The [Privacy module](doc/Privacy.md) enables the creation of "privacy preserving surveys". These are surveys
+that allow users to add "noise" to their responses, using local differential privacy mechanisms.
+The addition of the noise prevents 3rd parties from learning meaningful information about specific users, but at
+the same time aggregated statistics can be extracted. The accuracy of the extracted statistics depends on the
+number of responses. 
 
-### Relation with SOFIE
-
-More information about this component and its relation to the SOFIE project can be found in [D2.5 Federation Framework, SOFIE deliverable](https://media.voog.com/0000/0042/0957/files/SOFIE_D2.5-Federation_Framework%2C_2nd_version.pdf)
-
-
-### Key Technologies
-
+The [Data Sovereignty module](doc/Data-Sovereignty.md) implements an OAuth 2.0 Authorization Server. This server
+accepts "authorization grants" and if the grant is valid it generates an "access token" encoded using the
+JSON web token format. Accepted types of authorization grants are: Decentralized Identifiers, Verifiable Credentials, and pre-shared secret keys. The generated web token can be used by any web service, as well as with SOFIE's
+[Identity, Authentication, and Authorization (IAA) Component](https://github.com/SOFIE-project/identity-authentication-authorization)  
 
 
 ## Usage
@@ -19,12 +21,8 @@ More information about this component and its relation to the SOFIE project can 
 * For the Data Sovereignty module, see the [Data Sovereignty module documentation](doc/Data-Sovereignty.md)
 
 
-## Known/Open Issues
-
-No known issues
-
 ## Contact info
 
-Please contact Nikos Fotiou or Dimitris Dimopoulos (AUEB) in case of any questions.
+Please contact Nikos Fotiou or Iakovos Pittaras (AUEB) in case of any questions.
 
 ***
