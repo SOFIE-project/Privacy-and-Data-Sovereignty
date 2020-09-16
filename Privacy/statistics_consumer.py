@@ -1,13 +1,19 @@
 from web3 import Web3
+import json
 
-class Reviewer:
+class Consumer:
     def __init__(self):
-        w3 = Web3(Web3.HTTPProvider("HTTP://127.0.0.1:8545"))
-        self.account = w3.eth.accounts[0]
-        survey_sc_address = "0xe78A0F7E598Cc8b0Bb87894B0F60dD2a88d6a8Ab"
-        with open('conf/contract/build/survey.abi', 'r') as myfile:
-            abi = myfile.read()
-        self.surveyContract_instance = w3.eth.contract(abi = abi, address = survey_sc_address)
+        with open('conf/privacy.conf') as f:
+            self.conf = json.load(f)       
+        try:
+            w3 = Web3(Web3.HTTPProvider(self.conf['web3provider']))
+            self.account = w3.eth.accounts[0]
+            with open('conf/contract/build/survey.abi', 'r') as myfile:
+                abi = myfile.read()
+            self.surveyContract_instance = w3.eth.contract(abi = abi, address = Web3.toChecksumAddress(self.conf['survey_sc_address']))
+        except:
+            print("Couldn't connect to Ethereum blockchain:" + self.conf['web3provider'])
+            pass
 
     def _estimate_responses(self, responses, total_responders):
         estimations = [0] * len(responses)
