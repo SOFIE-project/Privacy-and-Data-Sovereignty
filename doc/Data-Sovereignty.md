@@ -1,6 +1,6 @@
 # Data Sovereignty Module
 - [Description](#Description)
-    - [Architechture Overview](#Architecture-Overview)
+    - [Architecture Overview](#Architecture-Overview)
     - [Relation with SOFIE](#Relation-with-SOFIE)
     - [Key Technologies](#Key-Technologies)
 - [Usage](#Usage)
@@ -22,9 +22,14 @@
 This is the documentation for the Data Sovereignty module of SOFIE's PDS component. It implements an OAuth2.0 authorization server. It accepts as
 authorization grants: Decentralized Identifiers, Verifiable Credentials, and pre-shared secret keys. It outputs JSON web tokens. 
 
-### Architecture
+### Architecture Overview
 
-TBD
+The architecture of the data sovereignty module is illustrated in Figure 1. It is composed of a resource owner, that defines
+access control policies, the PDS authorization server, that generates access tokens to legitimate client, and Clients that 
+provide authorization grants to receive access tokens.
+
+![Figure1](pds.png)
+Figure 1: The  Data Sovereignty module of the PDS component.
 
 ### Relation with SOFIE
 The Data Sovereignty module is part of SOFIE's [PDS](https://github.com/SOFIE-project/Privacy-and-Data-Sovereignty) component.
