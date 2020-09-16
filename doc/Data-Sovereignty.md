@@ -29,7 +29,7 @@ access control policies, the PDS authorization server, that generates access tok
 provide authorization grants to receive access tokens.
 
 ![Figure1](pds.png)
-Figure 1: The  Data Sovereignty module of the PDS component.
+Figure 1: The  Data Sovereignty module.
 
 ### Relation with SOFIE
 The Data Sovereignty module is part of SOFIE's [PDS](https://github.com/SOFIE-project/Privacy-and-Data-Sovereignty) component.
