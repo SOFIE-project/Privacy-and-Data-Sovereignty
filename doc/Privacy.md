@@ -13,10 +13,8 @@
 - [Testing](#Testing)
     - [Prerequisites for Testing](#Prerequisites-for-Testing)
     - [Running the Tests](#Running-the-Tests)
-    - [Evaluating Results](Evaluating-Results)
-- [Generating Documentation](#Generating-Documentation)
+    - [Evaluating Results](#Evaluating-the-Results)
 - [Open Issues](#Open-Issues)
-- [Future Work](#Future-Work)
 - [Release Notes](#Release-Notes)
 - [Contact Info](#Contact-Info)
 - [License](#License)
@@ -130,7 +128,7 @@ pip3 install pytest-asyncio
 
 ### Running the Tests
 
-Execute the following commnad
+Execute the following command
 
 ```bash
 python3 -m pytest -s tests/test_privacy.py 
