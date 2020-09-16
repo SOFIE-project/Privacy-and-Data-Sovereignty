@@ -31,7 +31,7 @@ number of responses.
 User results are stored in a smart contract, included in the module. Therefore, since all answers are public
 anybody can extract the aggregated statistics. 
 
-### Architecture
+### Architecture Overview
 
 The architecture of the privacy module is illustrated in Figure 1. It is composed of a Service Provider, that creates
 surveys, a Data Provider, that provides responses to the survey, and a Statistics Consumer that extracts statistics
@@ -135,6 +135,7 @@ python3 -m pytest -s tests/test_privacy.py
 ```
 
 ### Evaluating the Results
+
 Test results are shown in the standard output. 
 
 ## Known/Open Issues
