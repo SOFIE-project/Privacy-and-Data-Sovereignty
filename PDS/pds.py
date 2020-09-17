@@ -58,7 +58,7 @@ class PDSHandler():
         req  = Request(environ)
         form = req.form
         code = 403
-        output = {'code':403, 'message':'Invalide or missing input parameters'}
+        output = 'Invalide or missing input parameters'.encode()
 
         grant_type        = form.get("grant-type", None)
         grant             = form.get("grant", None)
@@ -80,7 +80,7 @@ class PDSHandler():
             '''
             code, output = self.indy_pdp.verify_did(grant, challenge, proof, True)
             if code == 200:
-                metadata = self.indy_pdp.get_did_metadata(grant)
+                metadata = output
         if (grant_type == "auth_code"):
             metadata  = form.get("metadata", None)
             code = 200
@@ -88,14 +88,14 @@ class PDSHandler():
             with open(self.conf['as_private_key'], mode='rb') as file: 
                 as_private_key = file.read()
             token,claims = self.pds.generate_token(as_private_key, metadata, enc_key)
-            output = {'code':200,'message':token.decode('utf-8')}
+            output = token.decode('utf-8')
             if (log_token):
-                self.logger.log_token(log_token, output['message'])
+                self.logger.log_token(log_token, output)
                 print("token logged")
             if (record_erc721):
-                self.erc721_pdp.record_erc721(claims['jti'], output['message'])
+                self.erc721_pdp.record_erc721(claims['jti'], output)
                 print("Creating ERC-721 token")
-        response = Response(json.dumps(output).encode(), status=code, mimetype='application/json')
+        response = Response(output, status=code, mimetype='application/json')
         return response(environ, start_response)
     
     def __call__(self, environ, start_response):

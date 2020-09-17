@@ -36,9 +36,8 @@ def test_valid_auth_code_with_logging():
     nbf = time.mktime(datetime.datetime(2020, 4, 1, 00, 00).timetuple())
     exp = time.mktime(datetime.datetime(2020, 4, 1, 23, 59).timetuple()) 
     payload = {'grant-type':'auth_code', 'grant':'shared_secret_key', 'metadata':json.dumps({'aud': 'sofie-iot.eu','nbf':nbf, 'exp': exp}), 'log-token':'4qk3Ab43ufPQVif4GAzLUW'}
-    response  = requests.post("http://localhost:9001/gettoken", data = payload).text
-    response =json.loads(response)
-    token = response['message']
+    response  = requests.post("http://localhost:9001/gettoken", data = payload)
+    token = response.text
     PDSContract_instance = w3.eth.contract(abi=abi, address=address)
     DID, enc_token = PDSContract_instance.functions.get_token(0).call()
     assert (DID != None)

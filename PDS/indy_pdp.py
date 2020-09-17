@@ -28,7 +28,7 @@ class Indy_pdp:
 
     def verify_did(self, client_did, challenge = None, signature=None, only_wallet_lookup=False, user_generated_challenge=False):
         if (client_did !=None and challenge == None):
-            return 401, {'code':401, 'message' : 'Proof required','challenge': self.create_nonce()}
+            return 401, self.create_nonce()
         if (client_did != None and challenge != None and signature != None and self.wallet_handle!= None):
             if (only_wallet_lookup):
                 verkey = asyncio.get_event_loop().run_until_complete(
@@ -39,8 +39,8 @@ class Indy_pdp:
             verification = asyncio.get_event_loop().run_until_complete(
                 crypto.crypto_verify(verkey, challenge.encode(), base64.b64decode(signature)))
             if(verification):
-                return 200, {'code':200,'message':'Success'}
+                return 200, self.get_did_metadata(client_did)
             else:
-                return 403, {'code':403, 'message':'Signature verification failed'}
+                return 403, 'Signature verification failed'
         else:
-            return 403, {'code':403, 'message':'Invalide or missing input parameters'}
+            return 403, 'Invalide or missing input parameters'
