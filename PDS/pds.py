@@ -78,10 +78,9 @@ class PDSHandler():
             print(token_type)
             print(subject)
             '''
-            code, output = indy_pdp.verify_did(grant, challenge, proof, True)
+            code, output = self.indy_pdp.verify_did(grant, challenge, proof, True)
             if code == 200:
-                indy_pdp.get_did_metadata(grant)
-                metadata  = output['message']
+                metadata = self.indy_pdp.get_did_metadata(grant)
         if (grant_type == "auth_code"):
             metadata  = form.get("metadata", None)
             code = 200

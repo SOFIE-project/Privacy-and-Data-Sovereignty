@@ -23,13 +23,13 @@ class Indy_pdp:
     def get_did_metadata(self, ndid):
         metadata = asyncio.get_event_loop().run_until_complete(
             did.get_did_metadata(self.wallet_handle, ndid))
-        return 200, {'code':200,'message':metadata}
+        return metadata
 
 
     def verify_did(self, client_did, challenge = None, signature=None, only_wallet_lookup=False, user_generated_challenge=False):
         if (client_did !=None and challenge == None):
-            return 401, {'code':401, 'message' : 'Proof required','challenge': Indy.create_nonce()}
-        if (client_did != None and challenge != None and signature != None and wallet_handle!= None):
+            return 401, {'code':401, 'message' : 'Proof required','challenge': self.create_nonce()}
+        if (client_did != None and challenge != None and signature != None and self.wallet_handle!= None):
             if (only_wallet_lookup):
                 verkey = asyncio.get_event_loop().run_until_complete(
                     did.key_for_local_did(self.wallet_handle, client_did))
