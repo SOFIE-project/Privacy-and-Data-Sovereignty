@@ -2,7 +2,7 @@ FROM ubuntu:18.04
 
 ARG LISTENING_PORT
 
-EXPOSE ${LISTENING_PORT}:9001-9002
+EXPOSE ${LISTENING_PORT}:9001
 
 RUN apt update
 RUN apt install -y gnupg2 software-properties-common git
@@ -16,6 +16,5 @@ RUN pip3 install pynacl
 
 COPY PDS/ PDS/
 COPY conf/ conf/
-COPY pds_with_admin.sh /
-RUN chmod +x /pds_with_admin.sh
-ENTRYPOINT [ "/pds_with_admin.sh" ]
+
+ENTRYPOINT [ "python3", "PDS/pds.py" ]

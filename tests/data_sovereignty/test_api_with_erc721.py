@@ -1,26 +1,19 @@
-import sys, os
-myPath = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, myPath + '/../PDS/')
-
 from web3 import Web3
 import pytest
 import requests
 import json
-import asyncio
 import base64
 import datetime
 import time
 import jwt
 
 @pytest.fixture(autouse=True, scope="module")
-def server():
+def ganache():
     import subprocess
     import time
     global w3, account, ERC721Contract_instance
     p3 = subprocess.Popen(['ganache-cli', '-m', 'myth like bonus scare over problem client lizard pioneer submit female collect']) #use this mnemonic to much the contract address in configuration
     time.sleep(10)
-    p1 = subprocess.Popen(['python3', 'PDS/pds.py'])
-    time.sleep(5) #Otherwise the server is not ready when tests start
     w3 = Web3(Web3.HTTPProvider("HTTP://127.0.0.1:8545"))
     with open('conf/contract/build/ERC721Metadata.bin', 'r') as myfile:
         binfile = myfile.read()
@@ -34,7 +27,6 @@ def server():
     ERC721Contract_instance = w3.eth.contract(abi = abi, address = address)
 
     yield
-    p1.kill()
     p3.kill()
 
 

@@ -77,16 +77,9 @@ privileged role and can define themselves the token metadata.
 
 Response
 ```
-{'code':401, 'message' : 'Proof required','challenge': A challenge}
+{'code':401, challenge}
 ```
 
-Example
-```Python
-payload = {'grant-type':'DID'}
-response  = requests.post("http://localhost:9001/gettoken", data = payload).text
-response =json.loads(response)
-challenge = response['challenge']
-```
 ### Token request API call (authenticated users)
 | Parameter | Possible values |
 | --- | --- |
@@ -102,23 +95,12 @@ challenge = response['challenge']
 
 Response
 ```
-{'code':200, 'message' : The generated token}
+{'code':200, token}
 ```
 
-Example
-```Python
-nbf   = time.mktime(datetime.datetime(2020, 4, 1, 00, 00).timetuple())
-exp   = time.mktime(datetime.datetime(2020, 4, 1, 23, 59).timetuple())
-grant = "shared secret"
-key   = "E390CF3B5B93E921C45ED978737D89F61B8CAFF9DE76BFA5F63DA20386BCCA3B"
-payload = {'grant-type':'auth_code', 'grant':grant, 'log-token':'0xa5b9d60f32436310afebcfda832817a68921beb782fabf7915cc0460b443116a', 'enc-key':key, 'metadata':json.dumps({'aud': 'sofie-iot.eu','nbf':nbf, 'exp': exp}}
-response  = requests.post("http://localhost:9001/gettoken", data = payload).text
-response =json.loads(response)
-token = response['message']
-```
 
 ### Docker Images
-In order to build PDS image, execute the script `docker-build.sh`. Then you can run PDS using, for example,  `docker run -tid --rm -p 9001-9002:9001-9002 pds`. You can verify that PDS is running properly be executing in the examples folder: `python3 get_token.py`
+In order to build PDS image, execute the script `docker-build.sh`. Then you can run PDS using, for example,  `docker run -tid --rm -p 9001:9001 pds`. You can verify that PDS is running properly be executing in the examples folder: `python3 get_token.py`
 
 
 
@@ -131,12 +113,6 @@ For testing purposes ganache-cli and Indy testing pool are required. To install 
 npm install -g ganache-cli
 ```
 
-To install Indy testing pool, execute from the component's root folder:
-
-```bash
-docker build -f tests/conf/indy-pool.dockerfile -t indy_pool . 
-```
-
 Tests are executed using pytest and pytest-asyncio. To install it execute 
 
 ```bash
@@ -145,17 +121,10 @@ pip3 install pytest-asyncio
 ```
 
 ### Running the tests
-First you need to run Hyperledger Indy testing pool:
+From the root directory run:
 
 ```bash
-docker run --name test_pool -itd --rm -p 9701-9708:9701-9708 indy_pool
-```
-
-Then you need to setup Indy testing accounts, and finally run the test. From the root directory run:
-
-```bash
-python3 tests/indy_setup.py 
-python3 -m pytest -s  tests/
+python3 -m pytest -s  tests/data_sovereignty/ --tb=short
 ```
 
 ### Evaluating the Results

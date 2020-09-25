@@ -1,23 +1,9 @@
-import sys, os
-myPath = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, myPath + '/../PDS/')
 
 import pytest
 import requests
 import json
-import base64
 import datetime
 import time
-import jwt
-
-@pytest.fixture(autouse=True, scope="module")
-def server():
-    import subprocess
-    import time
-    p1 = subprocess.Popen(['python3', 'PDS/pds.py'])
-    time.sleep(5) #Otherwise the server is not ready when tests start
-    yield
-    p1.kill()
 
 
 def test_valid_auth_code():
