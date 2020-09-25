@@ -131,7 +131,7 @@ pip3 install pytest-asyncio
 Execute the following command
 
 ```bash
-python3 -m pytest -s tests/test_privacy.py 
+python3 -m pytest -s tests/privacy/test_privacy.py 
 ```
 
 ### Evaluating the Results

@@ -3,7 +3,7 @@ from web3 import Web3
 
 import sys, os
 myPath = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, myPath + '/../Privacy/')
+sys.path.insert(0, myPath + '/../../Privacy/')
 from data_provider import Provider
 from statistics_consumer import Consumer
 from service_provider import Service_Provider

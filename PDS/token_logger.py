@@ -7,7 +7,6 @@ class Token_logger:
             self.conf = json.load(f)
         try:
             self.w3 = Web3(Web3.HTTPProvider(self.conf['web3provider']))
-            self.account = self.w3.eth.accounts[0]
             with open('conf/contract/build/PDS.abi', 'r') as myfile:
                 abi = myfile.read()
             self.PDSContract_instance = self.w3.eth.contract(abi=abi, address=Web3.toChecksumAddress(self.conf['pds_sc_address']))
@@ -16,6 +15,5 @@ class Token_logger:
             pass
 
     def log_token(self, metadata, token):
-        tx_hash = self.PDSContract_instance.functions.new_token(self.w3.toBytes(text=metadata), self.w3.toBytes(text=token)).transact({'from': self.account})
-        #self.w3.eth.waitForTransactionReceipt(tx_hash)
-        print("recording")
+        account = self.w3.eth.accounts[0]
+        tx_hash = self.PDSContract_instance.functions.new_token(self.w3.toBytes(text=metadata), self.w3.toBytes(text=token)).transact({'from': account})
