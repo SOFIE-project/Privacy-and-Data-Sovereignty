@@ -16,6 +16,5 @@ RUN pip3 install pynacl
 
 COPY PDS/ PDS/
 COPY conf/ conf/
-COPY pds_with_admin.sh /
-RUN chmod +x /pds_with_admin.sh
-ENTRYPOINT [ "/pds_with_admin.sh" ]
+
+ENTRYPOINT [ "python3", "PDS/pds.py" ]
