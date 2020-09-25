@@ -1,9 +1,9 @@
 {
   "name": "sofie-pds",
-  "version": "1.0.3",
-  "description": "Smart contract to store access tokens logged on the blockchain.",
+  "version": "1.0.4",
+  "description": "SA smart contract used for logging access token generated with SOFIE PDS component.",
   "files": [
-    "*.sol"
+    "*PDS.sol"
   ],
   "repository": "https://github.com/SOFIE-project/Privacy-and-Data-Sovereignty",
   "author": "SOFIE Project",
