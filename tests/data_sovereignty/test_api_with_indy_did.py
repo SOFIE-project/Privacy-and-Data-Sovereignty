@@ -27,3 +27,12 @@ async def test_valid_did():
     token = response.text
     assert(response.status_code == 200)
     await wallet.close_wallet(wallet_handle)
+
+@pytest.mark.asyncio
+async def test_add_did():
+    client_did    = '7FJs8MXbdTTmWx3HNyfMRN'
+    client_verkey = '4QUGgBZDpnHXHa1gJ3rTNhQcCwC94DjFt5iSwgQ3dbVm'
+    payload = {'action':'add','did':client_did, 'verkey': client_verkey ,'password':'thepassword', 'metadata':json.dumps({'aud':'sofie-iot.eu'})}
+    response = requests.post("http://localhost:9001/", data = payload)
+    assert(response.status_code == 200)
+
