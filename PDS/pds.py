@@ -28,7 +28,7 @@ class PDS():
         log_token         = form.get("log-token", None)
         enc_key           = form.get("enc-key", None)
         record_erc721     = form.get("erc-721", None)
-        action            = form.get("erc-721", None)
+        action            = form.get("action", None)
         if (action == "add"): # Administrative interface
             metadata  = form.get("metadata", None)
             client_did = form.get("did", None)

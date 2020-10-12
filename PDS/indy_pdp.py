@@ -18,8 +18,9 @@ class Indy_pdp:
     def add_did(self, client_did, client_verkey, metadata, password):
         if (password != self.password):
             return 401
-        self.acl['client_did']['ver_key'] = ver_key
-        self.acl['client_did']['jwt_metadata'] = metadata
+        self.acl[client_did] = {}
+        self.acl[client_did]['ver_key'] = client_verkey
+        self.acl[client_did]['jwt_metadata'] = json.loads(metadata)
         return 200
 
     def authorize(self, grant, challenge = None, signature=None, only_wallet_lookup=False, user_generated_challenge=False):
