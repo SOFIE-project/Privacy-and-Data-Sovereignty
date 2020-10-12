@@ -20,6 +20,8 @@ def test_valid_auth_code_with_encryption():
     enc_token = response.text
     sealed_box = SealedBox(secret_key)
     token = sealed_box.decrypt(base64.urlsafe_b64decode(enc_token))
-    print(token)
+    print(public_key)
+    print(secret_key.encode(nacl.encoding.HexEncoder))
+    print(enc_token)
     assert(response.status_code == 200 ) 
 

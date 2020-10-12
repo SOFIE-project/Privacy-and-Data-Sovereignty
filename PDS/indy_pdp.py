@@ -9,11 +9,18 @@ class Indy_pdp:
         with open('conf/indy.conf') as f:
             conf = json.load(f)
         self.acl = conf['acl']
+        self.password = conf['admin_password']
 
 
     def create_nonce(self, length=30):
         return ''.join([str(random.randint(0, 9)) for i in range(length)])
 
+    def add_did(self, client_did, client_verkey, metadata, password):
+        if (password != self.password):
+            return 401
+        self.acl['client_did']['ver_key'] = ver_key
+        self.acl['client_did']['jwt_metadata'] = metadata
+        return 200
 
     def authorize(self, grant, challenge = None, signature=None, only_wallet_lookup=False, user_generated_challenge=False):
         if (grant !=None and challenge == None):

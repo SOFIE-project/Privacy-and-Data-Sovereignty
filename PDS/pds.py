@@ -28,7 +28,16 @@ class PDS():
         log_token         = form.get("log-token", None)
         enc_key           = form.get("enc-key", None)
         record_erc721     = form.get("erc-721", None)
-
+        action            = form.get("erc-721", None)
+        if (action == "add"): # Administrative interface
+            metadata  = form.get("metadata", None)
+            client_did = form.get("did", None)
+            client_verkey = form.get("verkey", None)
+            password  = form.get("password", None)
+            code = self.indy_pdp.add_did(client_did, client_verkey, metadata, password)
+            output = "OK"
+            response = Response(output, status=code, mimetype='application/json')
+            return response(environ, start_response) 
         if (grant_type == "DID"):
             code, output = self.indy_pdp.authorize(grant, challenge, proof, True)
             if code == 200:
