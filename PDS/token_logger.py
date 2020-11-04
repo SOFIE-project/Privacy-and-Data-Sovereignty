@@ -16,4 +16,4 @@ class Token_logger:
 
     def log_token(self, metadata, token):
         account = self.w3.eth.accounts[0]
-        tx_hash = self.PDSContract_instance.functions.new_token(self.w3.toBytes(text=metadata), self.w3.toBytes(text=token)).transact({'from': account})
+        tx_hash = self.PDSContract_instance.functions.new_token(metadata, self.w3.toBytes(text=token)).transact({'from': account})

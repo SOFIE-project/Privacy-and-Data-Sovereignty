@@ -32,7 +32,7 @@ def test_valid_auth_code_with_logging():
     global w3, abi, account, address
     nbf = time.mktime(datetime.datetime(2020, 4, 1, 00, 00).timetuple())
     exp = time.mktime(datetime.datetime(2020, 4, 1, 23, 59).timetuple()) 
-    payload = {'grant-type':'auth_code', 'grant':'shared_secret_key', 'metadata':json.dumps({'aud': 'sofie-iot.eu','nbf':nbf, 'exp': exp}), 'log-token':'4qk3Ab43ufPQVif4GAzLUW'}
+    payload = {'grant-type':'auth_code', 'grant':'shared_secret_key', 'metadata':json.dumps({'aud': 'sofie-iot.eu','nbf':nbf, 'exp': exp}), 'log-token':'0x68656c6c6f20776f726c640d0a'}
     response  = requests.post("http://localhost:9001/gettoken", data = payload)
     token = response.text
     PDSContract_instance = w3.eth.contract(abi=abi, address=address)
