@@ -65,7 +65,7 @@ class PDS():
 def main(): 
     from werkzeug.serving import run_simple
     app = PDS()
-    run_simple('', 9001, app)
+    run_simple('0.0.0.0', 9001, app)
 
 if __name__ == '__main__':
     main()
