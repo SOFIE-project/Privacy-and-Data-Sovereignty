@@ -143,7 +143,7 @@ No known issues
 
 ## Contact info
 
-Please use github issues page  in case of any questions.
+Please use github issues for posting questions.
 
 ## License
 
