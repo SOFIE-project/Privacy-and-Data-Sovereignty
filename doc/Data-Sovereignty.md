@@ -14,7 +14,6 @@
     - [Running the Tests](#Running-the-Tests)
     - [Evaluating Results](#Evaluating-the-Results)
 - [Open Issues](#Open-Issues)
-- [Release Notes](#Release-Notes)
 - [Contact Info](#Contact-Info)
 - [License](#License)
 
@@ -24,16 +23,16 @@ authorization grants: Decentralized Identifiers, Verifiable Credentials, and pre
 
 ### Architecture Overview
 
-The architecture of the data sovereignty module is illustrated in Figure 1. It is composed of a resource owner, that defines
-access control policies, the PDS authorization server, that generates access tokens to legitimate client, and Clients that 
+The architecture of the data sovereignty module is illustrated in Figure 1. It is composed of a resource owner that defines
+access control policies, the PDS authorization server that generates access tokens to legitimate client, and Clients that 
 provide authorization grants to receive access tokens.
 
 ![Figure1](pds.png)
-Figure 1: The  Data Sovereignty module.
+*Figure 1: The  Data Sovereignty module.*
 
 ### Relation with SOFIE
 The Data Sovereignty module is part of SOFIE's [PDS](https://github.com/SOFIE-project/Privacy-and-Data-Sovereignty) component.
-PDS is used by SOFIE's [Energy data exchange](https://media.voog.com/0000/0042/0957/files/sofie-onepager-energy-exchange_final.pdf) and [Food supply chain](https://media.voog.com/0000/0042/0957/files/sofie-onepager-food_final.pdf) pilots in order to implement access control over the shared energy data. 
+PDS is used by SOFIE's [Energy data exchange](https://media.voog.com/0000/0042/0957/files/sofie-onepager-energy-exchange_final.pdf) and [Food supply chain](https://media.voog.com/0000/0042/0957/files/sofie-onepager-food_final.pdf) pilots. 
 
 More information about this component and its relation to the SOFIE project can be found in [D2.5 Federation Framework, SOFIE deliverable](https://media.voog.com/0000/0042/0957/files/SOFIE_D2.5-Federation_Framework%2C_2nd_version.pdf)
 
@@ -66,7 +65,7 @@ a token, and the AS responds with an authentication challenge, the client respon
 All API calls are made using the HTTP POST method and all parameters are included in the POST request payload. 
 
 Currently clients can be authenticated using either a DID, or an `authentication grant'. In the former case
-the PDS should be configured with token metadata per authorized DID (using the administrative interface).
+the PDS should be configured with token metadata per authorized DID.
 The latter case is based in a pre-configured, shared secret. Clients authenticated using the grant have a 
 privileged role and can define themselves the token metadata. 
 
@@ -138,7 +137,7 @@ No known issues
 
 ## Contact info
 
-Please contact Nikos Fotiou or Iakovos Pittaras (AUEB) in case of any questions.
+Please use github issues page  in case of any questions.
 
 ## License
 
