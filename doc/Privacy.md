@@ -15,15 +15,14 @@
     - [Running the Tests](#Running-the-Tests)
     - [Evaluating Results](#Evaluating-the-Results)
 - [Open Issues](#Open-Issues)
-- [Release Notes](#Release-Notes)
 - [Contact Info](#Contact-Info)
 - [License](#License)
 
 ## Description
 This is the documentation for the Privacy module of SOFIE's [PDS](https://github.com/SOFIE-project/Privacy-and-Data-Sovereignty) component. 
 
-This module enables the creation of "privacy preserving surveys". These are surveys
-that allow users to add "noise" to their responses, using local differential privacy mechanisms.
+This module enables the creation of *privacy preserving surveys*. These are surveys
+that allow users to add *noise* to their responses, using local differential privacy mechanisms.
 The addition of the noise prevents 3rd parties from learning meaningful information about specific users, but at
 the same time aggregated statistics can be extracted. The accuracy of the extracted statistics depends on the
 number of responses.
@@ -33,8 +32,8 @@ anybody can extract the aggregated statistics.
 
 ### Architecture Overview
 
-The architecture of the privacy module is illustrated in Figure 1. It is composed of a Service Provider, that creates
-surveys, a Data Provider, that provides responses to the survey, and a Statistics Consumer that extracts statistics
+The architecture of the privacy module is illustrated in Figure 1. It is composed of a Service Provider that creates
+surveys, a Data Provider that provides responses to the survey, and a Statistics Consumer that extracts statistics
 using the provided responses. All responses are stored in an Ethereum smart contract. 
 
 ![Figure1](privacy.png)
@@ -42,12 +41,12 @@ Figure 1: The privacy module of the PDS component.
 
 ### Relation with SOFIE
 The privacy module is part of SOFIE's [PDS](https://github.com/SOFIE-project/Privacy-and-Data-Sovereignty) component.
-PDS is used by SOFIE's [Energy data exchange](https://media.voog.com/0000/0042/0957/files/sofie-onepager-energy-exchange_final.pdf) and [Food supply chain](https://media.voog.com/0000/0042/0957/files/sofie-onepager-food_final.pdf) pilots in order to implement access control over the shared energy data. 
+PDS is used by SOFIE's [Energy data exchange](https://media.voog.com/0000/0042/0957/files/sofie-onepager-energy-exchange_final.pdf) and [Food supply chain](https://media.voog.com/0000/0042/0957/files/sofie-onepager-food_final.pdf) pilots. 
 
 More information about this component and its relation to the SOFIE project can be found in [D2.5 Federation Framework, SOFIE deliverable](https://media.voog.com/0000/0042/0957/files/SOFIE_D2.5-Federation_Framework%2C_2nd_version.pdf)
 
 ### Key technologies
-The software modules are implemented in Python 3. Survey responses are stored in an Ethereum smart contract. In order to provide local differential the basic one-time RAPPOR algorithm is used. This algorithm is described in 
+The software modules are implemented in Python 3. Survey responses are stored in an Ethereum smart contract. In order to provide local differential the *basic one-time RAPPOR* algorithm is used. This algorithm is described in 
 
 > U. Erlingsson, V. Pihur, and A. Korolova, “RAPPOR: Randomized
 Aggregatable Privacy-Preserving Ordinal Response,” in Proc. of ACM
@@ -56,7 +55,7 @@ SIGSAC Conference on Computer and Communications Security, 2014
 ## Usage
 
 ### Prerequisites
-Python 3 the web3 library are required. Web3 can be installed Ubuntu 18.04 using
+Python 3 and the web3 library are required. Web3 can be installed Ubuntu 18.04 using
 
 ```bash
 pip3 install web3
@@ -78,7 +77,7 @@ Edit the configuration file `conf/privacy.conf` and provide the following inform
 
 ### Execution
 
-Before using this module a "survey" must be created. Each survey is composed by a single question that has multiple possible answers (multiple choice question). 
+Before using this module a *survey* must be created. Each survey is composed of a single question that has multiple possible answers (multiple choice question). 
 
 A survey can be used using the `Service_Provider` class included in the `service_provider.py` file.
 This class implements a method called  `create_survey` that accepts the following inputs:
@@ -144,7 +143,7 @@ No known issues
 
 ## Contact info
 
-Please contact Nikos Fotiou or Iakovos Pittaras (AUEB) in case of any questions.
+Please use github issues for posting questions.
 
 ## License
 
